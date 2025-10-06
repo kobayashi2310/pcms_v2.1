@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ログイン</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center vh-100">
+
+<div class="card shadow-lg p-4 rounded-4" style="width: 350px;">
+    <div class="text-center mb-4">
+        <i class="bi bi-person-circle" style="font-size: 4rem; color: #0d6efd;"></i>
+        <h3 class="mt-2">ログイン</h3>
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <!-- ユーザー名 -->
+        <div class="mb-3">
+            <label for="username" class="form-label">
+                <i class="bi bi-person-fill me-1"></i> ユーザー名
+            </label>
+            <input type="text" id="username" name="username"
+                   class="form-control" placeholder="ユーザー名を入力" required>
+        </div>
+
+        <!-- パスワード -->
+        <div class="mb-3">
+            <label for="password" class="form-label">
+                <i class="bi bi-lock-fill me-1"></i> パスワード
+            </label>
+            <input type="password" id="password" name="password"
+                   class="form-control" placeholder="パスワードを入力" required>
+        </div>
+
+        <!-- エラーメッセージ（例：Spring Securityの login?error=true 用） -->
+        <div th:if="${param.error}" class="alert alert-danger py-2">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            ユーザー名またはパスワードが正しくありません
+        </div>
+
+        <!-- ボタン -->
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-box-arrow-in-right me-1"></i> ログイン
+            </button>
+        </div>
+    </form>
+
+    <div class="mt-3 text-center">
+        <a href="#" class="text-decoration-none">
+            <i class="bi bi-key-fill me-1"></i> パスワードを忘れた場合
+        </a>
+    </div>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
