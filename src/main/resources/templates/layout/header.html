@@ -7,7 +7,7 @@
     <div class="container-fluid px-0">
       <nav class="navbar navbar-expand-lg navbar-light bg-danger border-bottom fixed-top">
         <div class="container">
-          <a class="navbar-brand fw-bold text-white" th:href="@{/}">PCMS</a>
+          <a class="navbar-brand fw-bold text-white" th:href="@{/pcms}">PCMS</a>
 
           <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
             <span class="navbar-toggler-icon"></span>
@@ -21,8 +21,13 @@
                 </a>
               </li>
               <li class="nav-item" sec:authorize="isAnonymous()">
-                <a class="nav-link text-white" th:href="@{/login}">
+                <a class="nav-link text-white" th:href="@{/pcms/login}">
                   <i class="bi bi-person-circle"></i> ログイン
+                </a>
+              </li>
+              <li class="nav-item" sec:authorize="isAnonymous()">
+                <a class="nav-link text-white" th:href="@{/admin/login}">
+                  <i class="bi bi-shield-lock-fill"></i> 管理者ログイン
                 </a>
               </li>
               <li class="nav-item">
@@ -44,6 +49,11 @@
                     <i class="bi bi-box-arrow-right me-1"></i>ログアウト
                   </button>
                 </form>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" th:href="@{/}">
+                  <i class="bi bi-house-fill me-1"></i>トップページへ
+                </a>
               </li>
             </ul>
           </div>

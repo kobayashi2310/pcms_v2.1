@@ -5,9 +5,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
+import java.util.Collection;
 
 @Configuration
 @EnableWebSecurity
@@ -23,8 +27,29 @@ public class SecurityConfig {
         http
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll());
+                        .anyRequest().permitAll()
+                )
+                .formLogin(form -> form
+                        .loginPage("/pcms/login")
+                        .successHandler(customAuthenticationSuccessHandler())
+                );
         return http.build();
+    }
+
+    @Bean
+    AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return (req, res, auth) -> {
+          Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+          String redirectUrl;
+
+          if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+              redirectUrl = "/pcms/admin";
+          } else {
+              redirectUrl = "/pcms/";
+          }
+
+          res.sendRedirect(redirectUrl);
+        };
     }
 
 }

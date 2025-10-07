@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高度ITビジネス科 ポータルホーム</title>
+
+  <link th:href="@{css/bootstrap/bootstrap.min.css}" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{css/bootstrap/bootstrap-icons.css}">
+
+  <style>
+      :root {
+          --main-red: #e60023;
+          --primary-bg: #1a1a1a;
+          --secondary-bg: #2c2c2c;
+          --card-bg: #383838;
+          --text-primary: #f0f0f0;
+          --text-secondary: #888;
+          --border-color: #444;
+          --grid-color: rgba(255, 255, 255, 0.05);
+      }
+
+      body.light-mode {
+          --primary-bg: #f8f9fa;
+          --secondary-bg: #ffffff;
+          --card-bg: #ffffff;
+          --text-primary: #212529;
+          --text-secondary: #6c757d;
+          --border-color: #dee2e6;
+          --grid-color: rgba(0, 0, 0, 0.05);
+      }
+
+      body {
+          font-family: 'Noto Sans JP', sans-serif;
+          background-color: var(--primary-bg);
+          color: var(--text-primary);
+          background-image:
+                  linear-gradient(var(--grid-color) 1px, transparent 1px),
+                  linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+          background-size: 2rem 2rem;
+          display: flex;
+          align-items: center;
+          min-height: 100vh;
+          transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+      }
+
+      .portal-container {
+          background-color: var(--secondary-bg);
+          border-top: 4px solid var(--main-red);
+          border-radius: 0.5rem;
+          animation: fadeIn 0.6s ease-out forwards;
+          transition: background-color 0.3s ease;
+      }
+
+      .portal-card {
+          background-color: var(--card-bg);
+          border: 1px solid var(--border-color);
+          border-radius: 0.5rem;
+          transition: all 0.3s ease;
+      }
+      .portal-card:hover {
+          transform: translateY(-10px);
+          border-color: var(--main-red);
+          box-shadow: 0 0 25px rgba(230, 0, 35, 0.6);
+      }
+      .portal-card .bi {
+          color: var(--main-red);
+          transition: transform 0.3s ease;
+      }
+      .portal-card:hover .bi {
+          transform: scale(1.1);
+      }
+
+      .theme-toggle-btn {
+          width: 45px;
+          height: 45px;
+          font-size: 1.2rem;
+          line-height: 1;
+          color: var(--text-secondary);
+          background-color: var(--secondary-bg);
+          border: 1px solid var(--border-color);
+      }
+      .theme-toggle-btn:hover {
+          color: var(--text-primary);
+          border-color: var(--main-red);
+      }
+
+  </style>
+</head>
+<body>
+
+<div class="container my-5">
+  <div class="portal-container position-relative shadow-lg p-4 p-md-5">
+
+    <div class="position-absolute top-0 end-0 m-3">
+      <button id="themeToggleBtn" class="btn rounded-circle p-2 theme-toggle-btn">
+        <i id="themeToggleIcon" class="bi bi-moon-stars-fill"></i>
+      </button>
+    </div>
+
+    <header class="text-center mb-5">
+      <h1 class="display-5 fw-bold text-uppercase" style="letter-spacing: 2px;">
+        Advanced IT Business
+      </h1>
+      <p class="lead" style="color: var(--text-primary);">ポータルサイト</p>
+    </header>
+
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <a href="#" class="text-decoration-none">
+          <div class="portal-card text-center p-4 h-100">
+            <i class="bi bi-rocket-takeoff-fill display-2 mb-3"></i>
+            <h3 class="fw-bold" style="color: var(--text-primary);">卒研アプリ</h3>
+            <p style="color: var(--text-secondary);">卒業研究で制作した<br>アプリケーションはこちら</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-md-6 col-lg-5">
+        <a th:href="@{/pcms}" class="text-decoration-none">
+          <div class="portal-card text-center p-4 h-100">
+            <i class="bi bi-laptop-fill display-2 mb-3"></i>
+            <h3 class="fw-bold" style="color: var(--text-primary);">PC貸出・管理システム</h3>
+            <p style="color: var(--text-secondary);">PCの貸出状況の確認<br>および予約はこちら</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{js/bootstrap.bundle.min.js}"></script>
+<script>
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeToggleIcon = document.getElementById('themeToggleIcon');
+    const body = document.body;
+
+    const applyTheme = (theme) => {
+        if (theme === 'light') {
+            body.classList.add('light-mode');
+            themeToggleIcon.classList.remove('bi-moon-stars-fill');
+            themeToggleIcon.classList.add('bi-sun-fill');
+        } else {
+            body.classList.remove('light-mode');
+            themeToggleIcon.classList.remove('bi-sun-fill');
+            themeToggleIcon.classList.add('bi-moon-stars-fill');
+        }
+    };
+
+    const currentTheme = localStorage.getItem('theme');
+    applyTheme(currentTheme || 'light');
+
+    themeToggleBtn.addEventListener('click', () => {
+        let newTheme;
+        if (body.classList.contains('light-mode')) {
+            newTheme = 'dark';
+        } else {
+            newTheme = 'light';
+        }
+        applyTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
+</script>
+</body>
+</html>

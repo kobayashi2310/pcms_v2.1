@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja"
+      layout:decorate="~{layout/layout}"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<body>
+<div layout:fragment="content">
+  <main>
+    <div class="container mt-5 mb-5 d-flex flex-column justify-content-center align-items-center"
+         style="display: inline;">
+
+      <div class="d-flex align-items-center justify-content-center flex-wrap text-center mb-4">
+        <h1 class="fw-bold text-primary me-3 mb-0">
+          <i class="bi bi-pc-display-horizontal"></i> PCMS スタートページ
+        </h1>
+        <img alt="icon" th:src="@{/img/T-2.png}" class="responsive-icon d-none d-sm-block">
+      </div>
+
+<!--      <div th:if="${logoutMessage}" class="alert alert-success alert-dismissible fade show" role="alert">-->
+<!--        <span th:text="${logoutMessage}"></span>-->
+<!--        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>-->
+<!--      </div>-->
+
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-6 mb-3" sec:authorize="isAnonymous()">
+          <div class="card shadow-sm bg-light">
+            <div class="card-body text-center">
+              <h5 class="card-title fw-bold">ログイン</h5>
+              <p class="text-muted">アカウントにログインして操作を開始します。</p>
+              <a class="btn btn-primary btn-custom" th:href="@{/pcms/login}"><i
+                  class="bi bi-person-circle"></i> ログイン</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6 mb-3">
+          <div class="card shadow-sm bg-light">
+            <div class="card-body text-center">
+              <h5 class="card-title fw-bold">予約状況一覧</h5>
+              <p class="text-muted">現在の予約状況を確認します。</p>
+              <a class="btn btn-success btn-custom" th:href="@{/reservationList}"><i
+                  class="bi bi-calendar-check"></i> 予約状況確認</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6 mb-3" sec:authorize="isAuthenticated()">
+          <div class="card shadow-sm bg-light">
+            <div class="card-body text-center">
+              <h5 class="card-title fw-bold">予約</h5>
+              <p class="text-muted">新しい予約を作成します。</p>
+              <a class="btn btn-warning btn-custom" th:href="@{/reservation}"><i
+                  class="bi bi-pencil-square"></i> 予約する</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6 mb-3" sec:authorize="isAuthenticated()">
+          <div class="card shadow-sm bg-light">
+            <div class="card-body text-center">
+              <h5 class="card-title fw-bold">PC返却</h5>
+              <p class="text-muted">PCを返却する操作を行います。</p>
+              <a class="btn btn-danger btn-custom" th:href="@{/mypage/return}"><i
+                  class="bi bi-arrow-return-left"></i> PC返却</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6 mb-3" sec:authorize="isAnonymous()">
+          <div class="card shadow-sm bg-light">
+            <div class="card-body text-center">
+              <h5 class="card-title fw-bold">管理者用ログイン</h5>
+              <p class="text-muted">管理者ページへログインします。</p>
+              <a class="btn btn-primary" th:href="@{/admin/login}">
+                <i class="bi bi-shield-lock-fill"></i> 管理者ログイン
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6 mb-3" sec:authorize="isAuthenticated()">
+          <div class="card shadow-sm bg-light">
+            <div class="card-body text-center">
+              <h5 class="card-title fw-bold">ログアウト</h5>
+              <p class="text-muted">アカウントからログアウトします。</p>
+              <form method="post" th:action="@{/logout}" onsubmit="return confirm('本当にログアウトしますか？');">
+                <button class="btn btn-secondary btn-custom" type="submit">
+                  <i class="bi bi-box-arrow-right"></i> ログアウト
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-center">
+          <img alt="PCMS" th:src="@{/img/T-4.jpg}" class="img-fluid mb-4" style="max-width: 600px; width: 100%;">
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
