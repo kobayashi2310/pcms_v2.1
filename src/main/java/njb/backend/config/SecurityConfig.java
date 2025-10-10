@@ -27,11 +27,22 @@ public class SecurityConfig {
         http
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/css/**", "/js/**", "/img/**", "/js/**").permitAll()
+                        .requestMatchers("/", "/pcms", "/pcms/login", "/pcms/reservation").permitAll()
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
                         .loginPage("/pcms/login")
-                        .successHandler(customAuthenticationSuccessHandler())
+                        .usernameParameter("studentId")
+                        .passwordParameter("password")
+                        .loginProcessingUrl("/pcms/login")
+                        .defaultSuccessUrl("/pcms", true)
+                        .failureUrl("/pcms/login?error=true")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/pcms/logout")
+                        .logoutSuccessUrl("/pcms")
                 );
         return http.build();
     }
