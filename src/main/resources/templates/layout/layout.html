@@ -1,22 +1,30 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">PCMS</title>
     <link th:href="@{/css/bootstrap/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/css/bootstrap/bootstrap-icons.css}" rel="stylesheet">
     <link th:href="@{/css/header/style.css}" rel="stylesheet">
-  </head>
-  <body>
-    <header th:replace="~{layout/header :: header}"></header>
+    <style>
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+    </style>
+</head>
+<body>
 
-    <div layout:fragment="content">
-    </div>
+<div th:replace="~{layout/header :: header}"></div>
 
-    <footer th:replace="~{layout/footer :: footer}"></footer>
-    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-  </body>
+<main layout:fragment="content">
+</main>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
 </html>
 

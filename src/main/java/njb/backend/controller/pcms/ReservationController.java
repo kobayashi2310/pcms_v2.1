@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/pcms/reservations")
@@ -26,10 +28,18 @@ public class ReservationController {
     private final PeriodRepository periodRepository;
 
     @GetMapping
-    public String reservationPage(@RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, Model model) {
+    public String reservationPage(
+            @RequestParam(name = "date", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate date,
+            Model model
+    ) {
         LocalDate selectedDate = (date == null) ? LocalDate.now() : date;
 
         model.addAttribute("reservations", reservationService.getReservationsByDate(selectedDate));
+
+        Map<Long, Set<Byte>> bookedPcsAndPeriods = reservationService.getBookedPcsAndPeriodsForDate(selectedDate);
+        model.addAttribute("bookedPcsAndPeriods", bookedPcsAndPeriods);
 
         if (!model.containsAttribute("reservationRequest")) {
             ReservationRequestDto dto = new ReservationRequestDto();

@@ -15,9 +15,7 @@ import njb.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +37,23 @@ public class ReservationService {
         return reservationRepository.findByDateOrderByPeriod_PeriodAsc(date).stream()
                 .map(ReservationResponseDto::new)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 指定された日付の予約済みPCと時限のマップを取得します。
+     * @param date 取得する日付
+     * @return Key: PC ID, Value: 予約済みの時限IDのセット
+     */
+    public Map<Long, Set<Byte>> getBookedPcsAndPeriodsForDate(LocalDate date) {
+        List<Reservation> reservations = reservationRepository.findByDateOrderByPeriod_PeriodAsc(date);
+        return reservations.stream()
+                .collect(Collectors.groupingBy(
+                        reservation -> reservation.getPc().getId(),
+                        Collectors.mapping(reservation -> reservation
+                                .getPeriod().getPeriod(),
+                                Collectors.toSet()
+                        )
+                ));
     }
 
     /**

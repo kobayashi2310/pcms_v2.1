@@ -65,19 +65,27 @@ public class Reservation {
         this.status = ReservationStatus.PENDING_APPROVAL;
     }
 
+    @Getter
     public enum ReservationStatus {
         /**
          * 承諾目
          */
-        PENDING_APPROVAL,
+        PENDING_APPROVAL("承認待ち"),
         /**
          * 承諾後
          */
-        APPROVED,
+        APPROVED("承認済み"),
         /**
          * 返却済み
          */
-        RETRACTED,
+        RETRACTED("返却済み");
+
+        private final String displayName;
+
+        ReservationStatus(String displayName) {
+            this.displayName = displayName;
+        }
+
     }
 
 }
