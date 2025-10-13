@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import njb.backend.dto.pcms.reservation.ReservationRequestDto;
 import njb.backend.dto.pcms.reservation.ReservationResponseDto;
+import njb.backend.dto.pcms.returned.ReservationGroupDto;
+import njb.backend.dto.pcms.returned.ReturnReportDto;
 import njb.backend.model.Pc;
 import njb.backend.model.Period;
 import njb.backend.model.Reservation;
@@ -15,6 +17,8 @@ import njb.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -104,5 +108,94 @@ public class ReservationService {
 
         reservationRepository.saveAll(reservationsToSave);
     }
-}
 
+    /**
+     * 指定された学生の予約リストを取得します。
+     * @param studentId 検索する学生の学籍番号
+     * @return 予約情報のDTOリスト
+     */
+    public List<ReservationGroupDto> findGroupedReservationsByStudentId(String studentId) {
+        User user = userRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new IllegalArgumentException("指定された学生IDのユーザーが見つかりません。"));
+
+        List<Reservation> userReservations = reservationRepository.findByUserOrderByDateDescPeriod_PeriodAsc(user);
+
+        List<ReservationGroupDto> groupedList = new ArrayList<>();
+        if (userReservations.isEmpty()) {
+            return groupedList;
+        }
+
+        List<Reservation> currentGroupList = new ArrayList<>();
+        for (Reservation currentReservation : userReservations) {
+            if (currentGroupList.isEmpty()) {
+                currentGroupList.add(currentReservation);
+            } else {
+                boolean isConsecutive = isIsConsecutive(currentReservation, currentGroupList);
+
+                if (isConsecutive) {
+                    currentGroupList.add(currentReservation);
+                } else {
+                    groupedList.add(convertListToGroupDto(currentGroupList));
+                    currentGroupList.clear();
+                    currentGroupList.add(currentReservation);
+                }
+            }
+        }
+
+        groupedList.add(convertListToGroupDto(currentGroupList));
+
+        return groupedList;
+    }
+
+    private boolean isIsConsecutive(Reservation currentReservation, List<Reservation> currentGroupList) {
+        Reservation lastReservationInGroup = currentGroupList.getLast();
+
+        return lastReservationInGroup.getDate().equals(currentReservation.getDate()) &&
+                lastReservationInGroup.getPc().getId().equals(currentReservation.getPc().getId()) &&
+                lastReservationInGroup.getStatus() == currentReservation.getStatus() &&
+                (lastReservationInGroup.getPeriod().getPeriod() + 1 == currentReservation.getPeriod().getPeriod());
+    }
+
+    private ReservationGroupDto convertListToGroupDto(List<Reservation> groupList) {
+        if (groupList == null || groupList.isEmpty()) {
+            return null;
+        }
+        Reservation first = groupList.getFirst();
+        Reservation last = groupList.getLast();
+
+        ReservationGroupDto dto = new ReservationGroupDto();
+        dto.setDate(first.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        dto.setPcSerialNumber(first.getPc().getSerialNumber());
+        dto.setStartPeriodName(first.getPeriod().getName());
+        dto.setEndPeriodName(last.getPeriod().getName());
+        dto.setStatus(first.getStatus());
+        dto.setReservationIds(groupList.stream().map(Reservation::getId).collect(Collectors.toList()));
+        return dto;
+    }
+
+
+    /**
+     * 学生が返却報告します。
+     * @param reservationId 返却する予約のID
+     * @param studentId 返却報告を行う学生の学籍番号
+     * @param dto 返却報告の内容（返却理由など）
+     */
+    public void reportReturnByStudent(Long reservationId, String studentId, ReturnReportDto dto) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("指定された予約が見つかりません。ID: " + reservationId));
+
+        if (!reservation.getUser().getStudentId().equals(studentId)) {
+            throw new SecurityException("他人の予約を操作することはできません");
+        }
+
+        if (reservation.getStatus() != Reservation.ReservationStatus.APPROVED) {
+            throw new IllegalStateException("承認済みの予約のみ返却可能です");
+        }
+
+        reservation.setStatus(Reservation.ReservationStatus.RETRACTED);
+        reservation.setRetractedAt(LocalDateTime.now());
+        reservation.setRetractionReason(dto.getRetractionReason());
+        reservationRepository.save(reservation);
+    }
+
+}

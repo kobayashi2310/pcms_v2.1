@@ -3,6 +3,7 @@ package njb.backend.controller.pcms;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import njb.backend.dto.pcms.reservation.ReservationRequestDto;
+import njb.backend.dto.pcms.returned.ReturnReportDto;
 import njb.backend.repository.PcRepository;
 import njb.backend.repository.PeriodRepository;
 import njb.backend.service.ReservationService;
@@ -77,5 +78,38 @@ public class ReservationController {
         }
 
         return "redirect:/pcms/reservations?date=" + reservationRequest.getDate();
+    }
+
+    @GetMapping("/my-reservations")
+    public String myReservationPage(
+            Authentication authentication,
+            Model model
+    ) {
+        String studentId = authentication.getName();
+        model.addAttribute("myReservations", reservationService.findGroupedReservationsByStudentId(studentId));
+        return "pcms/my-reservations";
+    }
+
+    @PostMapping("/report-return/{id}")
+    public String reportReturn(
+            @PathVariable("id") Long reservationId,
+            @ModelAttribute ReturnReportDto dto,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            String studentId = authentication.getName();
+            reservationService.reportReturnByStudent(reservationId, studentId, dto);
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "予約ID:" + reservationId + "の返却報告を行いました"
+            );
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "返却報告に失敗しました:" + e.getMessage()
+            );
+        }
+        return "redirect:/pcms/reservations/my-reservations";
     }
 }

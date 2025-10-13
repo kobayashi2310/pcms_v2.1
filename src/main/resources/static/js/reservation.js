@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const dateInput = document.getElementById('date');
+
     if(dateInput) {
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -38,4 +39,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     updatePeriodCheckboxes();
+
 });
