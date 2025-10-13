@@ -3,12 +3,12 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
-  <title>予約一覧</title>
+  <title>マイ予約一覧</title>
 </head>
 <body>
 <main layout:fragment="content">
   <div class="container mt-4">
-    <h2 class="mb-3">予約一覧</h2>
+    <h2 class="mb-3">マイ予約一覧</h2>
 
     <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
@@ -46,6 +46,13 @@
                     th:attr="data-reservation-ids=${#strings.listJoin(group.reservationIds, ',')}">
               返却報告
             </button>
+
+            <button type="button" class="btn btn-sm btn-outline-danger"
+                    data-bs-toggle="modal" data-bs-target="#cancelModal"
+                    th:if="${group.status.name() == 'PENDING_APPROVAL'}"
+                    th:attr="data-reservation-ids=${#strings.listJoin(group.reservationIds, ',')}">
+              キャンセル
+            </button>
           </td>
         </tr>
         </tbody>
@@ -62,7 +69,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <input type="hidden" id="reservationIds" name="reservationIds"/>
+            <input type="hidden" id="returnReservationIds" name="reservationIds"/>
             <div class="mb-3">
               <label for="retractionReason" class="form-label">作業報告</label>
               <textarea class="form-control" id="retractionReason" name="retractionReason" rows="3" placeholder="PCで行った作業内容を記入してください。" required></textarea>
@@ -78,10 +85,31 @@
     </div>
   </div>
 
+  <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="cancelForm" th:action="@{/pcms/reservations/cancel}" method="post">
+          <div class="modal-header">
+            <h5 class="modal-title" id="cancelModalLabel">予約のキャンセル</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>本当にこの予約をキャンセルしますか？</p>
+            <input type="hidden" id="cancelReservationIds" name="reservationIds"/>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">いいえ</button>
+            <button type="submit" class="btn btn-danger">はい</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
   <th:block layout:fragment="script">
-    <script th:src="@{/js/my-reservations.js}" defer></script>
+    <script th:src="@{/js/myReservations.js}" defer></script>
   </th:block>
 </main>
 </body>
 </html>
-

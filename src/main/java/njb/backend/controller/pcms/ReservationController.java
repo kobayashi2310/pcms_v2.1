@@ -11,13 +11,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequestMapping("/pcms/reservations")
@@ -112,4 +112,30 @@ public class ReservationController {
         }
         return "redirect:/pcms/reservations/my-reservations";
     }
+
+    @PostMapping("/cancel")
+    public String cancelReservations(
+            @RequestParam("reservationIds") String reservationIdsStr,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            List<Long> reservationIds;
+            if (StringUtils.hasText(reservationIdsStr)) {
+                reservationIds = Arrays.stream(reservationIdsStr.split(","))
+                        .map(Long::parseLong)
+                        .toList();
+            } else {
+                reservationIds = Collections.emptyList();
+            }
+
+            String studentId = authentication.getName();
+            reservationService.cancelReservationsByStudent(reservationIds, studentId);
+            redirectAttributes.addFlashAttribute("successMessage", "予約をキャンセルしました");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "予約のキャンセルに失敗しました:" + e.getMessage());
+        }
+        return "redirect:/pcms/reservations/my-reservations";
+    }
+
 }

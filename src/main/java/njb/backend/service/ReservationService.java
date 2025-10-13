@@ -198,4 +198,28 @@ public class ReservationService {
         reservationRepository.save(reservation);
     }
 
+    public void cancelReservationsByStudent(List<Long> reservationIds, String studentId) {
+        if (reservationIds == null || reservationIds.isEmpty()) {
+            throw new IllegalArgumentException("キャンセル対象の予約が指定されていません");
+        }
+
+        List<Reservation> reservationsToDelete = new ArrayList<>();
+        for (Long reservationId : reservationIds) {
+            Reservation reservation = reservationRepository.findById(reservationId)
+                    .orElseThrow(() -> new IllegalArgumentException("指定された予約が見つかりません。ID:" + reservationId));
+
+            if (!reservation.getUser().getStudentId().equals(studentId)) {
+                throw new SecurityException("他人の予約をキャンセルすることはできません");
+            }
+
+            if (reservation.getStatus() != Reservation.ReservationStatus.PENDING_APPROVAL) {
+                throw new IllegalStateException("予約ID:" + reservationId + "は承認待ちではないため、キャンセルできません");
+            }
+
+            reservationsToDelete.add(reservation);
+        }
+
+        reservationRepository.deleteAll(reservationsToDelete);
+    }
+
 }
