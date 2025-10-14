@@ -28,7 +28,9 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/js/**").permitAll()
-                        .requestMatchers("/", "/pcms", "/pcms/login", "/pcms/reservation").permitAll()
+                        .requestMatchers("/pcms/login").anonymous()
+                        .requestMatchers("/", "/pcms", "/pcms/reservation").permitAll()
+                        .requestMatchers("/pcms/reservations/my-reservations", "/pcms/reservations/report-return/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form

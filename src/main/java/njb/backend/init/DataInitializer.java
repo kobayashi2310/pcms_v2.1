@@ -20,10 +20,19 @@ public class DataInitializer implements CommandLineRunner {
         if (userRepository.findByStudentId("T22010").isEmpty()) {
             User user = new User();
             user.setStudentId("T22010");
-            user.setName("TEST");
-            user.setKana("テスト");
+            user.setName("小林輝流");
+            user.setKana("コバヤシ ヒカル");
             user.setEmail("njb-t22010@example.com");
             user.setHashedPassword(passwordEncoder.encode("password"));
+            user.setRole(User.UserRole.STUDENT);
+            userRepository.save(user);
+
+            user = new User();
+            user.setStudentId("T22017");
+            user.setName("山上結史");
+            user.setKana("ヤマガミ ユウシ");
+            user.setEmail("njb-t22017@sist.ac.jp");
+            user.setHashedPassword(passwordEncoder.encode("pass"));
             user.setRole(User.UserRole.STUDENT);
             userRepository.save(user);
         }
