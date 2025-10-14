@@ -5,6 +5,7 @@
       layout:decorate="~{layout/layout}">
 <head>
   <title>PC予約</title>
+  <link rel="stylesheet" th:href="@{/css/pcms/reservation.css}">
 </head>
 <body>
 <main layout:fragment="content">
@@ -17,35 +18,42 @@
     <div class="card mb-4">
       <div class="card-header">
         <div class="d-flex justify-content-between align-items-center">
-          <a th:href="@{/pcms/reservations(date=${prevDate})}" class="btn btn-outline-secondary">&lt; 前日</a>
+          <a th:href="@{/pcms/reservations(date=${prevDate})}" class="btn btn-outline-light btn-sm">&lt; 前日</a>
           <form th:action="@{/pcms/reservations}" method="get" class="d-inline-block my-0">
-            <input type="date" name="date" th:value="${#temporals.format(selectedDate, 'yyyy-MM-dd')}" onchange="this.form.submit()" class="form-control">
+            <label>
+              <input type="date" name="date" th:value="${#temporals.format(selectedDate, 'yyyy-MM-dd')}" onchange="this.form.submit()" class="form-control form-control-sm">
+            </label>
           </form>
-          <a th:href="@{/pcms/reservations(date=${nextDate})}" class="btn btn-outline-secondary">翌日 &gt;</a>
+          <a th:href="@{/pcms/reservations(date=${nextDate})}" class="btn btn-outline-light btn-sm">翌日 &gt;</a>
         </div>
       </div>
       <div class="card-body">
         <h2 class="h4" th:text="${#temporals.format(selectedDate, 'yyyy年MM月dd日')} + 'の予約一覧'"></h2>
         <div class="table-responsive" style="overflow-x: auto;">
-          <table class="table table-striped" style="min-width: 700px;">
+          <table class="table table-hover" style="min-width: 700px;">
             <thead>
             <tr>
-              <th>ID</th>
               <th>利用者</th>
               <th>PC</th>
-              <th>利用日</th>
               <th>利用時間帯</th>
               <th>ステータス</th>
             </tr>
             </thead>
             <tbody>
+            <tr th:if="${#lists.isEmpty(reservations)}">
+              <td colspan="4" class="text-center text-muted py-4">この日に予約はありません</td>
+            </tr>
             <tr th:each="reservation : ${reservations}">
-              <td class="text-nowrap" th:text="${reservation.reservationId}"></td>
               <td class="text-nowrap" th:text="${reservation.studentName}"></td>
               <td class="text-nowrap" th:text="${reservation.pcSerialNumber}"></td>
-              <td class="text-nowrap" th:text="${reservation.date}"></td>
               <td class="text-nowrap" th:text="${reservation.periodName}"></td>
-              <td class="text-nowrap" th:text="${reservation.status}"></td>
+              <td>
+                <span th:switch="${reservation.status.name()}">
+                  <span th:case="'PENDING_APPROVAL'" class="badge bg-warning text-dark" th:text="${reservation.status.getDisplayName()}"></span>
+                  <span th:case="'APPROVED'" class="badge" style="background-color: var(--theme-color-primary);" th:text="${reservation.status.getDisplayName()}"></span>
+                  <span th:case="'RETRACTED'" class="badge bg-secondary" th:text="${reservation.status.getDisplayName()}"></span>
+                </span>
+              </td>
             </tr>
             </tbody>
           </table>
@@ -77,11 +85,19 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label">利用時間帯 (連続した時限を選択)</label>
-            <div>
-              <div class="form-check form-check-inline" th:each="p : ${periods}">
-                <input class="form-check-input" th:classappend="${#fields.hasErrors('periodIds')} ? 'is-invalid' : ''" type="checkbox" th:field="*{periodIds}" th:value="${p.period}">
-                <label class="form-check-label" th:text="${p.name}"></label>
+            <label class="form-label">利用時間帯（連続した時限のみ選択可）</label>
+            <div class="d-flex flex-wrap gap-2 mb-2" role="group" aria-label="Time selection helpers">
+              <button type="button" class="btn btn-outline-secondary" id="select-am">午前</button>
+              <button type="button" class="btn btn-outline-secondary" id="select-pm">午後</button>
+              <button type="button" class="btn btn-outline-secondary" id="select-all-day">終日</button>
+              <button type="button" class="btn btn-outline-secondary" id="select-clear">クリア</button>
+            </div>
+            <div th:classappend="${#fields.hasErrors('periodIds')} ? 'is-invalid' : ''">
+              <div class="form-check form-check-inline custom-checkbox-lg" th:each="p : ${periods}">
+                <label>
+                  <input class="form-check-input" type="checkbox" th:field="*{periodIds}" th:value="${p.period}" th:id="|period-${p.period}|">
+                </label>
+                <label class="form-check-label" th:for="|period-${p.period}|" th:text="${p.name}"></label>
               </div>
             </div>
             <div th:if="${#fields.hasErrors('periodIds')}" class="invalid-feedback d-block" th:errors="*{periodIds}"></div>
@@ -93,16 +109,29 @@
             <div th:if="${#fields.hasErrors('reason')}" class="invalid-feedback" th:errors="*{reason}"></div>
           </div>
 
-          <button type="submit" class="btn btn-primary">予約申請</button>
+          <button type="submit" class="btn btn-primary w-100">予約申請</button>
         </form>
       </div>
     </div>
 
     <div class="alert alert-info" sec:authorize="!isAuthenticated()">
-      PCを予約するには、<a th:href="@{/pcms/login}">ログイン</a>してください。
+      PCを予約するには、<a th:href="@{/pcms/login}" class="alert-link">ログイン</a>してください。
+    </div>
+
+    <div class="mt-5 text-center">
+      <a th:href="@{/pcms}" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> ホームに戻る</a>
     </div>
 
   </div>
+
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const bookedData = /*[[${bookedPcsAndPeriods}]]*/ {};
+        /*]]>*/
+    </script>
+    <script th:src="@{/js/reservation.js}" defer></script>
+  </th:block>
 </main>
 </body>
 </html>

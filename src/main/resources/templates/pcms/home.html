@@ -48,10 +48,11 @@
         <div class="col-12 col-md-6 mb-3" sec:authorize="isAuthenticated()">
           <div class="card shadow-sm bg-light">
             <div class="card-body text-center">
-              <h5 class="card-title fw-bold">PC返却</h5>
+              <h5 class="card-title fw-bold">予約履歴</h5>
               <p class="text-muted">PCを返却する操作を行います。</p>
-              <a class="btn btn-danger btn-custom" th:href="@{/mypage/return}"><i
-                  class="bi bi-arrow-return-left"></i> PC返却</a>
+              <a class="btn btn-danger btn-custom" th:href="@{/pcms/reservations/myReservations}">
+                <i class="bi bi-arrow-return-left"></i>予約履歴
+              </a>
             </div>
           </div>
         </div>

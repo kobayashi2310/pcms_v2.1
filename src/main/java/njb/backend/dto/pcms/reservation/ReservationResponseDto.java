@@ -14,7 +14,7 @@ public class ReservationResponseDto {
     private String pcSerialNumber;
     private String date;
     private String periodName;
-    private String status;
+    private Reservation.ReservationStatus status;
 
     /**
      * ReservationエンティティからReservationResponseDtoを生成するコンストラクタです。
@@ -26,7 +26,7 @@ public class ReservationResponseDto {
         this.pcSerialNumber = reservation.getPc().getSerialNumber();
         this.date = reservation.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.periodName = reservation.getPeriod().getName();
-        this.status = reservation.getStatus().toString();
+        this.status = reservation.getStatus();
     }
 
 }

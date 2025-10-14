@@ -7,15 +7,24 @@
     <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">PCMS</title>
     <link th:href="@{/css/bootstrap/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/css/bootstrap/bootstrap-icons.css}" rel="stylesheet">
-    <link th:href="@{/css/header/style.css}" rel="stylesheet">
+    <link th:href="@{/css/pcms/layout/style.css}" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 70px;
+            padding-bottom: 70px;
+        }
+    </style>
   </head>
   <body>
-    <header th:replace="~{layout/header :: header}"></header>
 
-    <div layout:fragment="content">
-    </div>
+    <div th:replace="~{layout/header :: header}"></div>
 
-    <footer th:replace="~{layout/footer :: footer}"></footer>
+    <main layout:fragment="content">
+      <!-- 各ページのコンテンツがここに挿入されます -->
+    </main>
+
+    <div th:replace="~{layout/footer :: footer}"></div>
+
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
   </body>
 </html>

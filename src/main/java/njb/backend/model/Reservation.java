@@ -1,10 +1,7 @@
 package njb.backend.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
@@ -56,28 +53,23 @@ public class Reservation {
     @Column(name = "retraction_reason")
     private String retractionReason;
 
-    public Reservation(User user, Pc pc, LocalDate date, Period period, String reason) {
-        this.user = user;
-        this.pc = pc;
-        this.date = date;
-        this.period = period;
-        this.reason = reason;
-        this.status = ReservationStatus.PENDING_APPROVAL;
-    }
-
+    @RequiredArgsConstructor
+    @Getter
     public enum ReservationStatus {
         /**
          * 承諾目
          */
-        PENDING_APPROVAL,
+        PENDING_APPROVAL("承認待ち"),
         /**
          * 承諾後
          */
-        APPROVED,
+        APPROVED("承認済み"),
         /**
          * 返却済み
          */
-        RETRACTED,
+        RETRACTED("返却済み");
+
+        private final String displayName;
     }
 
 }
