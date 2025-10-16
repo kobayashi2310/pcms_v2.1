@@ -6,7 +6,7 @@ plugins {
 
 group = 'njb'
 version = '0.0.1-SNAPSHOT'
-description = 'backend'
+description = 'pcms'
 
 java {
     toolchain {

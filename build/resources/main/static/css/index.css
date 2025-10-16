@@ -1,0 +1,77 @@
+:root {
+    --main-red: #e60023;
+    --primary-bg: #1a1a1a;
+    --secondary-bg: #2c2c2c;
+    --card-bg: #383838;
+    --text-primary: #f0f0f0;
+    --text-secondary: #888;
+    --border-color: #444;
+    --grid-color: rgba(255, 255, 255, 0.05);
+}
+
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background-color: var(--primary-bg);
+    color: var(--text-primary);
+    background-image:
+            linear-gradient(var(--grid-color) 1px, transparent 1px),
+            linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 2rem 2rem;
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.portal-container {
+    background-color: var(--secondary-bg);
+    border-top: 4px solid var(--main-red);
+    border-radius: 0.5rem;
+    animation: fadeIn 0.6s ease-out forwards;
+    transition: background-color 0.3s ease;
+}
+
+.portal-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+.portal-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--main-red);
+    box-shadow: 0 0 25px rgba(230, 0, 35, 0.6);
+}
+.portal-card .bi {
+    color: var(--main-red);
+    transition: transform 0.3s ease;
+}
+.portal-card:hover .bi {
+    transform: scale(1.1);
+}
+
+.theme-toggle-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: var(--text-secondary);
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+}
+.theme-toggle-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--main-red);
+}
+
+.portal-container h1, .portal-container h3 {
+    color: var(--text-primary);
+}
+.portal-container .lead, .portal-card p {
+    color: var(--text-secondary);
+}
