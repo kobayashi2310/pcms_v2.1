@@ -1,5 +1,6 @@
 package njb.pcms.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,7 +16,10 @@ import java.util.Collection;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -31,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/pcms/login").anonymous()
                         .requestMatchers("/", "/pcms", "/pcms/reservation").permitAll()
                         .requestMatchers("/pcms/reservations/myReservations", "/pcms/reservations/report-return/**").authenticated()
+                        .requestMatchers("/pcms/admin/", "/pcms/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
@@ -38,31 +43,16 @@ public class SecurityConfig {
                         .usernameParameter("studentId")
                         .passwordParameter("password")
                         .loginProcessingUrl("/pcms/login")
-                        .defaultSuccessUrl("/pcms", true)
+                        .successHandler(authenticationSuccessHandler)
                         .failureUrl("/pcms/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/pcms/logout")
                         .logoutSuccessUrl("/pcms")
+                        .permitAll()
                 );
         return http.build();
-    }
-
-    @Bean
-    AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-        return (req, res, auth) -> {
-          Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-          String redirectUrl;
-
-          if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-              redirectUrl = "/pcms/admin";
-          } else {
-              redirectUrl = "/pcms/";
-          }
-
-          res.sendRedirect(redirectUrl);
-        };
     }
 
 }

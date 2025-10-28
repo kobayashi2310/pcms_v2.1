@@ -18,6 +18,15 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (userRepository.findByStudentId("T22010").isEmpty()) {
+            User admin = new User();
+            admin.setStudentId("ADMIN");
+            admin.setName("ADMIN");
+            admin.setKana("ADMIN");
+            admin.setEmail("admin@localhost");
+            admin.setHashedPassword(passwordEncoder.encode("password"));
+            admin.setRole(User.UserRole.ADMIN);
+            userRepository.save(admin);
+
             User user = new User();
             user.setStudentId("T22010");
             user.setName("小林輝流");

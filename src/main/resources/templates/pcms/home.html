@@ -57,18 +57,6 @@
           </div>
         </div>
 
-        <div class="col-12 col-md-6 mb-3" sec:authorize="isAnonymous()">
-          <div class="card shadow-sm bg-light">
-            <div class="card-body text-center">
-              <h5 class="card-title fw-bold">管理者用ログイン</h5>
-              <p class="text-muted">管理者ページへログインします。</p>
-              <a class="btn btn-primary" th:href="@{/admin/login}">
-                <i class="bi bi-shield-lock-fill"></i> 管理者ログイン
-              </a>
-            </div>
-          </div>
-        </div>
-
         <div class="col-12 col-md-6 mb-3" sec:authorize="isAuthenticated()">
           <div class="card shadow-sm bg-light">
             <div class="card-body text-center">

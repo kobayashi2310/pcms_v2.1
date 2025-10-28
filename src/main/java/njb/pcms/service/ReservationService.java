@@ -22,6 +22,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static njb.pcms.model.Reservation.ReservationStatus.*;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -257,6 +259,34 @@ public class ReservationService {
             reservationsToDelete.add(reservation);
         }
         reservationRepository.deleteAll(reservationsToDelete);
+    }
+
+    public List<ReservationGroupDto> getPendingReservations() {
+        List<Reservation> pending = reservationRepository.findByStatusOrderByDateAscPeriod_PeriodAsc(PENDING_APPROVAL);
+        return groupReservations(pending);
+    }
+
+    public void approveReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("指定された予約が見つかりません"));
+
+        if (reservation.getStatus() != PENDING_APPROVAL) {
+            throw new IllegalStateException("この予約は承認待ちではありません");
+        }
+
+        reservation.setStatus(APPROVED);
+        reservation.setApprovedAt(LocalDateTime.now());
+        reservationRepository.save(reservation);
+    }
+
+    public void denyReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("指定された予約が見つかりません"));
+
+        if (reservation.getStatus() != PENDING_APPROVAL) {
+            throw new IllegalStateException("この予約は承認待ちではありません");
+        }
+        reservationRepository.delete(reservation);
     }
 
 }
