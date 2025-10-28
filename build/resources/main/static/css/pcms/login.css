@@ -1,0 +1,41 @@
+.login-container {
+    min-height: calc(100vh - 140px);
+}
+
+.login-form-wrapper {
+    width: 100%;
+    max-width: 450px;
+    padding: 2rem;
+    background-color: var(--bs-body-bg);
+}
+
+.login-icon {
+    font-size: 3.5rem;
+    color: var(--bs-primary);
+}
+
+.form-floating > label {
+    padding-left: 2.5rem;
+}
+
+.form-floating > label > i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--bs-secondary);
+}
+
+
+.password-toggle-btn {
+    border-left: 0;
+}
+
+.input-group > .form-floating:not(:last-child) > .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.input-group > .password-toggle-btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
