@@ -40,7 +40,7 @@ public class ReservationService {
      * @return グループ化された予約情報のDTOリスト
      */
     public List<ReservationGroupDto> getGroupedReservationsByDate(LocalDate date) {
-        var reservations = reservationRepository.findByDateOrderByPeriod_PeriodAsc(date);
+        List<Reservation> reservations = reservationRepository.findByDateOrderByPc_IdAscUser_IdAscPeriod_PeriodAsc(date);
         return groupReservations(reservations);
     }
 
@@ -51,12 +51,12 @@ public class ReservationService {
      * @return キーがLong型のPC ID、値が指定された日付に予約されている期間（Byte型）のセットであるマップ
      */
     public Map<Long, Set<Byte>> getBookedPcsAndPeriodsForDate(LocalDate date) {
-        List<Reservation> reservations = reservationRepository.findByDateOrderByPeriod_PeriodAsc(date);
+        List<Reservation> reservations = reservationRepository.findByDateOrderByPc_IdAscUser_IdAscPeriod_PeriodAsc(date);
         return reservations.stream()
                 .collect(Collectors.groupingBy(
                         reservation -> reservation.getPc().getId(),
                         Collectors.mapping(reservation -> reservation
-                                .getPeriod().getPeriod(),
+                                        .getPeriod().getPeriod(),
                                 Collectors.toSet()
                         )
                 ));
@@ -120,8 +120,8 @@ public class ReservationService {
         User user = userRepository.findByStudentId(studentId)
                 .orElseThrow(() -> new UsernameNotFoundException("指定された学生IDのユーザーが見つかりません"));
 
-       List<Reservation> userReservations = reservationRepository.findByUserOrderByDateDescPeriod_PeriodAsc(user);
-       return groupReservations(userReservations);
+        List<Reservation> userReservations = reservationRepository.findByUserOrderByDateDescPeriod_PeriodAsc(user);
+        return groupReservations(userReservations);
     }
 
     /**
@@ -135,8 +135,8 @@ public class ReservationService {
         if (groupList == null || groupList.isEmpty()) {
             return null;
         }
-        var first = groupList.getFirst();
-        var last = groupList.getLast();
+        Reservation first = groupList.getFirst();
+        Reservation last = groupList.getLast();
 
         ReservationGroupDto dto = new ReservationGroupDto();
         dto.setDate(first.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
@@ -148,14 +148,15 @@ public class ReservationService {
         dto.setReservationIds(
                 groupList.stream()
                         .map(Reservation::getId)
-                        .toList()
+                        .collect(Collectors.toList())
         );
+        dto.setReason(first.getReason());
+        dto.setCreatedAt(first.getCreatedAt());
         return dto;
     }
 
     /**
      * 特定の基準に基づいて、予約オブジェクトのリストを ReservationGroupDto オブジェクトのリストにグループ化します。
-     * 結果のリスト内の各グループは、連続していると見なされる予約のコレクションを表します。
      *
      * @param reservations グループ化する予約のリスト
      * @return 各項目が連続する予約のグループを表すオブジェクトへの予約グループのリスト
@@ -266,27 +267,47 @@ public class ReservationService {
         return groupReservations(pending);
     }
 
-    public void approveReservation(Long reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("指定された予約が見つかりません"));
-
-        if (reservation.getStatus() != PENDING_APPROVAL) {
-            throw new IllegalStateException("この予約は承認待ちではありません");
+    /**
+     * 予約を承認します（管理者機能）
+     * @param reservationIds 承認する予約IDのリスト
+     */
+    public void approveReservations(List<Long> reservationIds) {
+        if (reservationIds == null || reservationIds.isEmpty()) {
+            throw new IllegalArgumentException("承認対象の予約が指定されていません");
         }
+        List<Reservation> reservationsToApprove = new ArrayList<>();
+        for (Long id : reservationIds) {
+            Reservation reservation = reservationRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("指定された予約が見つかりません。ID: " + id));
 
-        reservation.setStatus(APPROVED);
-        reservation.setApprovedAt(LocalDateTime.now());
-        reservationRepository.save(reservation);
+            if (reservation.getStatus() != PENDING_APPROVAL) {
+                throw new IllegalStateException("予約ID: " + id + " は承認待ちではありません。");
+            }
+            reservation.setStatus(APPROVED); // 承認済みに変更
+            reservation.setApprovedAt(LocalDateTime.now());
+            reservationsToApprove.add(reservation); // リストに追加
+        }
+        reservationRepository.saveAll(reservationsToApprove); // ループの外で一括保存
     }
 
-    public void denyReservation(Long reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("指定された予約が見つかりません"));
-
-        if (reservation.getStatus() != PENDING_APPROVAL) {
-            throw new IllegalStateException("この予約は承認待ちではありません");
+    /**
+     * 予約を否認（削除）します（管理者機能）
+     * @param reservationIds 否認する予約IDのリスト
+     */
+    public void denyReservations(List<Long> reservationIds) {
+        if (reservationIds == null || reservationIds.isEmpty()) {
+            throw new IllegalArgumentException("否認対象の予約が指定されていません。");
         }
-        reservationRepository.delete(reservation);
-    }
+        List<Reservation> reservationsToDeny = new ArrayList<>();
+        for (Long id : reservationIds) {
+            Reservation reservation = reservationRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("指定された予約が見つかりません。ID: " + id));
 
+            if (reservation.getStatus() != PENDING_APPROVAL) {
+                throw new IllegalStateException("予約ID: " + id + " は承認待ちではありません。");
+            }
+            reservationsToDeny.add(reservation);
+        }
+        reservationRepository.deleteAll(reservationsToDeny);
+    }
 }

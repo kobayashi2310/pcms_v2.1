@@ -23,7 +23,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
      * @param date 検索する日付
      * @return 予約のリスト
      */
-    List<Reservation> findByDateOrderByPeriod_PeriodAsc(LocalDate date);
+    List<Reservation> findByDateOrderByPc_IdAscUser_IdAscPeriod_PeriodAsc(LocalDate date);
+
+    List<Reservation> findByDateOrderByPcIdAscUserIdAscPeriod_PeriodAsc(LocalDate date);
 
     List<Reservation> findByUserOrderByDateDescPeriod_PeriodAsc(User user);
 

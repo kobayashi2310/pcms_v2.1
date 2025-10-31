@@ -3,6 +3,7 @@ package njb.pcms.dto.pcms.reservation;
 import lombok.Data;
 import njb.pcms.model.Reservation;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -15,6 +16,8 @@ public class ReservationGroupDto {
     private String endPeriodName;
     private Reservation.ReservationStatus status;
     private List<Long> reservationIds;
+    private String reason;
+    private LocalDateTime createdAt;
 
     public String getPeriodRange() {
         if (startPeriodName.equals(endPeriodName)) {

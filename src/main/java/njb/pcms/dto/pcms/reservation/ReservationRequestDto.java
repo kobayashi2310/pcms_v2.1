@@ -24,4 +24,5 @@ public class ReservationRequestDto {
     @NotEmpty(message = "利用目的を入力してください。")
     @Size(max = 200, message = "利用目的は200文字以内で入力してください。")
     private String reason;
+
 }

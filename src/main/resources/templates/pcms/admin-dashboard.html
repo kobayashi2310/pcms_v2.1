@@ -21,8 +21,11 @@
         </div>
 
         <div class="list-group mb-4">
-            <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
+            <a th:href="@{/pcms/admin/dashboard}" class="list-group-item list-group-item-action active" aria-current="true">
                 <i class="bi bi-check2-circle me-2"></i>予約申請の承認・否認
+            </a>
+            <a th:href="@{/pcms/admin/transport}" class="list-group-item list-group-item-action">
+                <i class="bi bi-truck me-2"></i>PC持ち出し管理
             </a>
             <a href="#" class="list-group-item list-group-item-action disabled">
                 <i class="bi bi-people-fill me-2"></i>ユーザー管理 (実装予定)
@@ -41,7 +44,7 @@
                     <table class="table table-hover" style="min-width: 900px;">
                         <thead>
                         <tr>
-                            <th>申請日</th>
+                            <th>申請日時</th>
                             <th>利用者</th>
                             <th>利用希望日</th>
                             <th>PC</th>
@@ -55,20 +58,19 @@
                             <td colspan="7" class="text-center text-muted py-4">承認待ちの予約はありません。</td>
                         </tr>
                         <tr th:each="group : ${pendingReservations}">
-                            <td class="text-nowrap" th:text="${group.date}"></td> <!-- 実際には申請日時を表示したい -->
+                            <td class="text-nowrap" th:text="${#temporals.format(group.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
                             <td class="text-nowrap" th:text="${group.studentName}"></td>
                             <td class="text-nowrap" th:text="${group.date}"></td>
                             <td class="text-nowrap" th:text="${group.pcSerialNumber}"></td>
                             <td class="text-nowrap" th:text="${group.getPeriodRange()}"></td>
                             <td th:text="${group.reason}"></td>
                             <td class="text-nowrap">
-                                <!-- 注意：現在の実装ではグループ単位で承認/否認ボタンが表示されるが -->
-                                <!-- 実際の処理はグループ内の最初の予約IDに対してのみ行われる -->
-                                <!-- グループ内の全予約を処理するように修正が必要 -->
-                                <form th:action="@{/pcms/admin/reservations/approve/{id}(id=${group.reservationIds.get(0)})}" method="post" class="d-inline">
+                                <form th:action="@{/pcms/admin/reservations/approve}" method="post" class="d-inline">
+                                    <input type="hidden" name="reservationIds" th:value="${#strings.listJoin(group.reservationIds, ',')}" />
                                     <button type="submit" class="btn btn-sm btn-success">承認</button>
                                 </form>
-                                <form th:action="@{/pcms/admin/reservations/deny/{id}(id=${group.reservationIds.get(0)})}" method="post" class="d-inline">
+                                <form th:action="@{/pcms/admin/reservations/deny}" method="post" class="d-inline">
+                                    <input type="hidden" name="reservationIds" th:value="${#strings.listJoin(group.reservationIds, ',')}" />
                                     <button type="submit" class="btn btn-sm btn-danger">否認</button>
                                 </form>
                             </td>
