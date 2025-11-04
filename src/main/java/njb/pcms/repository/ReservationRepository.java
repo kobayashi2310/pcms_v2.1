@@ -25,8 +25,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
      */
     List<Reservation> findByDateOrderByPc_IdAscUser_IdAscPeriod_PeriodAsc(LocalDate date);
 
-    List<Reservation> findByDateOrderByPcIdAscUserIdAscPeriod_PeriodAsc(LocalDate date);
-
     List<Reservation> findByUserOrderByDateDescPeriod_PeriodAsc(User user);
 
     List<Reservation> findByStatusOrderByDateAscPeriod_PeriodAsc(Reservation.ReservationStatus status);

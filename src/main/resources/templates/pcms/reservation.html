@@ -67,69 +67,11 @@
       </div>
     </div>
 
-    <div class="accordion" id="reservationAccordion" sec:authorize="isAuthenticated()">
-      <div class="accordion-item card">
-        <h2 class="accordion-header card-header" id="headingOne">
-          <button th:class="${#fields.hasErrors('reservationRequest.*')} ? 'accordion-button' : 'accordion-button collapsed'"
-                  type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                  th:attr="aria-expanded=${#fields.hasErrors('reservationRequest.*')}" aria-controls="collapseOne">
-            新規予約申請
-          </button>
-        </h2>
-        <div id="collapseOne"
-             th:class="${#fields.hasErrors('reservationRequest.*')} ? 'accordion-collapse collapse show' : 'accordion-collapse collapse'"
-             aria-labelledby="headingOne" data-bs-parent="#reservationAccordion">
-          <div class="accordion-body card-body">
-            <form th:action="@{/pcms/reservations}" th:object="${reservationRequest}" method="post">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-
-              <div class="mb-3">
-                <label for="pc" class="form-label">PC</label>
-                <select class="form-select" id="pc" th:field="*{pcId}" th:classappend="${#fields.hasErrors('pcId')} ? 'is-invalid' : ''">
-                  <option value="">PCを選択してください</option>
-                  <option th:each="pc : ${pcs}" th:value="${pc.id}" th:text="${pc.serialNumber}"></option>
-                </select>
-                <div th:if="${#fields.hasErrors('pcId')}" class="invalid-feedback" th:errors="*{pcId}"></div>
-              </div>
-
-              <div class="mb-3">
-                <label for="date" class="form-label">利用日</label>
-                <input type="date" class="form-control" id="date" th:field="*{date}" th:classappend="${#fields.hasErrors('date')} ? 'is-invalid' : ''">
-                <div th:if="${#fields.hasErrors('date')}" class="invalid-feedback" th:errors="*{date}"></div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">利用時間帯（連続した時限のみ選択可）</label>
-                <div class="d-flex flex-wrap gap-2 mb-2" role="group" aria-label="Time selection helpers">
-                  <button type="button" class="btn btn-outline-secondary" id="select-am">午前</button>
-                  <button type="button" class="btn btn-outline-secondary" id="select-pm">午後</button>
-                  <button type="button" class="btn btn-outline-secondary" id="select-all-day">終日</button>
-                  <button type="button" class="btn btn-outline-secondary" id="select-clear">クリア</button>
-                </div>
-                <div th:classappend="${#fields.hasErrors('periodIds')} ? 'is-invalid' : ''">
-                  <div class="form-check form-check-inline custom-checkbox-lg" th:each="p : ${periods}">
-                    <label>
-                      <input class="form-check-input" type="checkbox" th:field="*{periodIds}" th:value="${p.period}" th:id="|period-${p.period}|">
-                    </label>
-                    <label class="form-check-label" th:for="|period-${p.period}|" th:text="${p.name}"></label>
-                  </div>
-                </div>
-                <div th:if="${#fields.hasErrors('periodIds')}" class="invalid-feedback d-block" th:errors="*{periodIds}"></div>
-              </div>
-
-              <div class="mb-3">
-                <label for="reason" class="form-label">利用目的</label>
-                <textarea class="form-control" id="reason" rows="3" th:field="*{reason}" th:classappend="${#fields.hasErrors('reason')} ? 'is-invalid' : ''"></textarea>
-                <div th:if="${#fields.hasErrors('reason')}" class="invalid-feedback" th:errors="*{reason}"></div>
-              </div>
-
-              <button type="submit" class="btn btn-primary w-100">予約申請</button>
-            </form>
-          </div>
-        </div>
-      </div>
+    <div sec:authorize="isAuthenticated()" class="mb-4">
+      <button type="button" class="btn btn-primary btn-lg w-100" data-bs-toggle="modal" data-bs-target="#reservationModal">
+        <i class="bi bi-calendar-plus-fill me-2"></i>新規予約申請を行う
+      </button>
     </div>
-
 
     <div class="alert alert-info" sec:authorize="!isAuthenticated()">
       PCを予約するには、<a th:href="@{/pcms/login}" class="alert-link">ログイン</a>してください。
@@ -141,10 +83,73 @@
 
   </div>
 
+  <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true" sec:authorize="isAuthenticated()">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form th:action="@{/pcms/reservations}" th:object="${reservationRequest}" method="post">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <div class="modal-header card-header">
+            <h5 class="modal-title" id="reservationModalLabel">新規予約申請</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="pcModal" class="form-label">PC</label>
+              <select class="form-select" id="pcModal" th:field="*{pcId}" th:classappend="${#fields.hasErrors('pcId')} ? 'is-invalid' : ''">
+                <option value="">PCを選択してください</option>
+                <option th:each="pc : ${pcs}"
+                        th:value="${pc.id}"
+                        th:text="${transportedPcIds.contains(pc.id)} ? pc.serialNumber + ' (故障対応中)' : pc.serialNumber"
+                        th:disabled="${transportedPcIds.contains(pc.id)}"></option>
+              </select>
+              <div th:if="${#fields.hasErrors('pcId')}" class="invalid-feedback" th:errors="*{pcId}"></div>
+            </div>
+
+            <div class="mb-3">
+              <label for="dateModal" class="form-label">利用日</label>
+              <input type="date" class="form-control" id="dateModal" th:field="*{date}" th:classappend="${#fields.hasErrors('date')} ? 'is-invalid' : ''">
+              <div th:if="${#fields.hasErrors('date')}" class="invalid-feedback" th:errors="*{date}"></div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">利用時間帯（連続した時限のみ選択可）</label>
+              <div class="d-flex flex-wrap gap-2 mb-2" role="group" aria-label="Time selection helpers">
+                <button type="button" class="btn btn-outline-secondary" id="modal-select-am">午前</button>
+                <button type="button" class="btn btn-outline-secondary" id="modal-select-pm">午後</button>
+                <button type="button" class="btn btn-outline-secondary" id="modal-select-all-day">終日</button>
+                <button type="button" class="btn btn-outline-secondary" id="modal-select-clear">クリア</button>
+              </div>
+              <div th:classappend="${#fields.hasErrors('periodIds')} ? 'is-invalid' : ''">
+                <div class="form-check form-check-inline custom-checkbox-lg" th:each="p : ${periods}">
+                  <label>
+                    <input class="form-check-input" type="checkbox" th:field="*{periodIds}" th:value="${p.period}" th:id="|modal-period-${p.period}|">
+                  </label>
+                  <label class="form-check-label" th:for="|modal-period-${p.period}|" th:text="${p.name}"></label>
+                </div>
+              </div>
+              <div th:if="${#fields.hasErrors('periodIds')}" class="invalid-feedback d-block" th:errors="*{periodIds}"></div>
+            </div>
+
+            <div class="mb-3">
+              <label for="reasonModal" class="form-label">利用目的</label>
+              <textarea class="form-control" id="reasonModal" rows="3" th:field="*{reason}" th:classappend="${#fields.hasErrors('reason')} ? 'is-invalid' : ''"></textarea>
+              <div th:if="${#fields.hasErrors('reason')}" class="invalid-feedback" th:errors="*{reason}"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+            <button type="submit" class="btn btn-primary" onclick="return confirm('予約申請を行いますか?')">予約申請</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <th:block layout:fragment="script">
     <script th:inline="javascript">
         /*<![CDATA[*/
         const bookedData = /*[[${bookedPcsAndPeriods}]]*/ {};
+        const hasErrors = /*[[${#fields.hasErrors('reservationRequest.*')}]]*/ false;
         /*]]>*/
     </script>
     <script th:src="@{/js/reservation.js}" defer></script>

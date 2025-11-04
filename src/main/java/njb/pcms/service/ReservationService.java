@@ -5,14 +5,8 @@ import lombok.RequiredArgsConstructor;
 import njb.pcms.dto.pcms.reservation.ReservationGroupDto;
 import njb.pcms.dto.pcms.reservation.ReservationRequestDto;
 import njb.pcms.dto.pcms.returned.ReturnReportDto;
-import njb.pcms.model.Pc;
-import njb.pcms.model.Period;
-import njb.pcms.model.Reservation;
-import njb.pcms.model.User;
-import njb.pcms.repository.PcRepository;
-import njb.pcms.repository.PeriodRepository;
-import njb.pcms.repository.ReservationRepository;
-import njb.pcms.repository.UserRepository;
+import njb.pcms.model.*;
+import njb.pcms.repository.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +27,7 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final PcRepository pcRepository;
     private final PeriodRepository periodRepository;
+    private final TransportRepository transportRepository;
 
     /**
      * 指定された日付の予約リストを、連続した時限でグループ化して取得します。
@@ -51,15 +46,28 @@ public class ReservationService {
      * @return キーがLong型のPC ID、値が指定された日付に予約されている期間（Byte型）のセットであるマップ
      */
     public Map<Long, Set<Byte>> getBookedPcsAndPeriodsForDate(LocalDate date) {
-        List<Reservation> reservations = reservationRepository.findByDateOrderByPc_IdAscUser_IdAscPeriod_PeriodAsc(date);
-        return reservations.stream()
+        var reservations = reservationRepository.findByDateOrderByPc_IdAscUser_IdAscPeriod_PeriodAsc(date);
+        Map<Long, Set<Byte>> bookedMap = reservations.stream()
                 .collect(Collectors.groupingBy(
-                        reservation -> reservation.getPc().getId(),
-                        Collectors.mapping(reservation -> reservation
-                                        .getPeriod().getPeriod(),
-                                Collectors.toSet()
-                        )
+                   reservation -> reservation.getPc().getId(),
+                   Collectors.mapping(reservation -> reservation
+                           .getPeriod().getPeriod(),
+                           Collectors.toSet()
+                   )
                 ));
+
+        List<Transport> activeTransportsOnDate = transportRepository.findByStatusAndCreatedAtLessThanEqualAndExpectedReturnDateGreaterThanEqual(
+                Transport.TransportStatus.IN_PROGRESS,
+                LocalDateTime.parse(date + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                date
+        );
+
+        Set<Byte> allPeriods = Set.of((byte)1, (byte)2, (byte)4);
+        for (Transport transport : activeTransportsOnDate) {
+            bookedMap.put(transport.getPc().getId(), allPeriods);
+        }
+
+        return bookedMap;
     }
 
     /**
@@ -72,6 +80,21 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("指定された学生IDのユーザーが見つかりません。"));
         Pc pc = pcRepository.findById(dto.getPcId())
                 .orElseThrow(() -> new IllegalArgumentException("指定されたPCが見つかりません。"));
+
+        boolean isTransported = transportRepository.existsByPc_IdAndStatusAndCreatedAtLessThanEqualAndExpectedReturnDateGreaterThanEqual(
+                pc.getId(),
+                Transport.TransportStatus.IN_PROGRESS,
+                LocalDateTime.parse(dto.getDate() + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                dto.getDate()
+        );
+        if (isTransported) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "このPCは %s にメンテナンス期間または持ち出し中のため予約できません。",
+                            dto.getDate()
+                    )
+            );
+        }
 
         List<Byte> periodIds = dto.getPeriodIds();
         Collections.sort(periodIds);
