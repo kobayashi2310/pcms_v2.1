@@ -34,6 +34,8 @@
             </select>
             <div th:if="${#fields.hasErrors('pcId')}" class="invalid-feedback" th:errors="*{pcId}"></div>
           </div>
+
+          <!-- TODO 学生、学籍番号検索機能の実装(学生は4学年分合わせて80人前後の想定) -->
           <div class="mb-3">
             <label for="userId" class="form-label">学生</label>
             <select id="userId" class="form-select" th:field="*{userId}" th:classappend="${#fields.hasErrors('userId')} ? 'is-invalid' : ''">
@@ -42,11 +44,20 @@
             </select>
             <div th:if="${#fields.hasErrors('userId')}" class="invalid-feedback" th:errors="*{userId}"></div>
           </div>
+          <!---->
+
           <div class="mb-3">
             <label for="destination" class="form-label">持ち出し先</label>
             <input type="text" id="destination" class="form-control" th:field="*{destination}" th:classappend="${#fields.hasErrors('destination')} ? 'is-invalid' : ''">
             <div th:if="${#fields.hasErrors('destination')}" class="invalid-feedback" th:errors="*{destination}"></div>
           </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="expectedReturnDate" class="form-label">返却予定日</label>
+            <input type="date" id="expectedReturnDate" class="form-control" th:field="*{expectedReturnDate}" th:classappend="${#fields.hasErrors('expectedReturnDate')} ? 'is-invalid' : ''">
+            <div th:if="${#fields.hasErrors('expectedReturnDate')}" class="invalid-feedback" th:errors="*{expectedReturnDate}"></div>
+          </div>
+
           <div class="mb-3">
             <label for="reason" class="form-label">理由（故障内容など）</label>
             <textarea id="reason" class="form-control" rows="3" th:field="*{reason}" th:classappend="${#fields.hasErrors('reason')} ? 'is-invalid' : ''"></textarea>
@@ -83,7 +94,8 @@
               <td th:text="${transport.user.name}"></td>
               <td th:text="${transport.destination}"></td>
               <td th:text="${transport.reason}"></td>
-              <td th:text="${#temporals.format(transport.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
+              <td th:text="${#temporals.format(transport.createdAt, 'yyyy/MM/dd')}"></td>
+              <td th:text="${#temporals.format(transport.expectedReturnDate, 'yyyy/MM/dd')}"></td>
               <td>
                 <!-- ここに「返却完了」ボタンを後で実装します -->
                 <button class="btn btn-sm btn-outline-success" disabled>返却完了</button>

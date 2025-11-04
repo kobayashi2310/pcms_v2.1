@@ -42,6 +42,7 @@ public class TransportService {
         transport.setUser(user);
         transport.setDestination(dto.getDestination());
         transport.setReason(dto.getReason());
+        transport.setExpectedReturnDate(dto.getExpectedReturnDate());
         transport.setStatus(Transport.TransportStatus.IN_PROGRESS);
 
         transportRepository.save(transport);

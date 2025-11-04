@@ -51,6 +51,13 @@
             <input type="text" id="destination" class="form-control" th:field="*{destination}" th:classappend="${#fields.hasErrors('destination')} ? 'is-invalid' : ''">
             <div th:if="${#fields.hasErrors('destination')}" class="invalid-feedback" th:errors="*{destination}"></div>
           </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="expectedReturnDate" class="form-label">返却予定日</label>
+            <input type="date" id="expectedReturnDate" class="form-control" th:field="*{expectedReturnDate}" th:classappend="${#fields.hasErrors('expectedReturnDate')} ? 'is-invalid' : ''">
+            <div th:if="${#fields.hasErrors('expectedReturnDate')}" class="invalid-feedback" th:errors="*{expectedReturnDate}"></div>
+          </div>
+
           <div class="mb-3">
             <label for="reason" class="form-label">理由（故障内容など）</label>
             <textarea id="reason" class="form-control" rows="3" th:field="*{reason}" th:classappend="${#fields.hasErrors('reason')} ? 'is-invalid' : ''"></textarea>
@@ -87,7 +94,8 @@
               <td th:text="${transport.user.name}"></td>
               <td th:text="${transport.destination}"></td>
               <td th:text="${transport.reason}"></td>
-              <td th:text="${#temporals.format(transport.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
+              <td th:text="${#temporals.format(transport.createdAt, 'yyyy/MM/dd')}"></td>
+              <td th:text="${#temporals.format(transport.expectedReturnDate, 'yyyy/MM/dd')}"></td>
               <td>
                 <!-- ここに「返却完了」ボタンを後で実装します -->
                 <button class="btn btn-sm btn-outline-success" disabled>返却完了</button>

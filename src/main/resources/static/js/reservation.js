@@ -1,6 +1,12 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const dateInput = document.getElementById('date');
-    if(dateInput) {
+document.addEventListener('DOMContentLoaded', () => {
+    const reservationModalEl = document.getElementById('reservationModal');
+    if (reservationModalEl && typeof hasErrors !== 'undefined' && hasErrors) {
+        const reservationModal = new bootstrap.Modal(reservationModalEl);
+        reservationModal.show();
+    }
+
+    const dateInput = document.getElementById('dateModal');
+    if (dateInput) {
         const today = new Date();
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -9,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
         dateInput.setAttribute('min', todayString);
     }
 
-    const pcSelect = document.getElementById('pc');
+    const pcSelect = document.getElementById('pcSelect');
     const periodCheckboxes = document.querySelectorAll('input[name="periodIds"]');
     const localBookedData = (typeof bookedData !== 'undefined') ? bookedData : {};
 
@@ -18,28 +24,32 @@ document.addEventListener('DOMContentLoaded', function() {
             const selectedPcId = pcSelect.value;
             const bookedPeriods = localBookedData[selectedPcId] || [];
 
-            periodCheckboxes.forEach(function(checkbox) {
-                const periodValue = parseInt(checkbox.value, 10);
-                const formCheckDiv = checkbox.closest('.form-check');
+            periodCheckboxes.forEach(checkbox => {
+               const periodValue = parseInt(checkbox.value, 10);
+               const formCheckDiv = checkbox.closest('.form-check');
 
-                if (bookedPeriods.includes(periodValue)) {
-                    checkbox.disabled = true;
-                    checkbox.checked = false;
-                    if(formCheckDiv) formCheckDiv.classList.add('text-muted');
-                } else {
-                    checkbox.disabled = false;
-                    if(formCheckDiv) formCheckDiv.classList.remove('text-muted');
-                }
+               if (bookedPeriods.includes(periodValue)) {
+                   checkbox.disabled = true;
+                   checkbox.checked = false;
+                   if (formCheckDiv) {
+                       formCheckDiv.classList.add('text-muted');
+                   } else {
+                       checkbox.disabled = false;
+                       if (formCheckDiv) {
+                           formCheckDiv.classList.remove('text-muted');
+                       }
+                   }
+               }
             });
         }
         pcSelect.addEventListener('change', updatePeriodCheckboxes);
         updatePeriodCheckboxes();
     }
 
-    const selectAmBtn = document.getElementById('select-am');
-    const selectPmBtn = document.getElementById('select-pm');
-    const selectAllDayBtn = document.getElementById('select-all-day');
-    const selectClearBtn = document.getElementById('select-clear');
+    const selectAmBtn = document.getElementById('modal-select-am');
+    const selectPmBtn = document.getElementById('modal-select-pm');
+    const selectAllDayBtn = document.getElementById('modal-select-all-day');
+    const selectClearBtn = document.getElementById('modal-select-clear');
 
     if (selectAmBtn) {
         selectAmBtn.addEventListener('click', function() {
@@ -80,5 +90,4 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-});
-
+})
