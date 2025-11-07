@@ -32,8 +32,14 @@ public class ReservationController {
     private final PeriodRepository periodRepository;
     private final TransportRepository transportRepository;
 
+    // GET /pcms/reservations
     @GetMapping
-    public String reservationPage(@RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, Model model) {
+    public String reservationPage(
+            @RequestParam(name = "date", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate date,
+            Model model
+    ) {
         LocalDate selectedDate = (date == null) ? LocalDate.now() : date;
 
         model.addAttribute("reservations", reservationService.getGroupedReservationsByDate(selectedDate));
@@ -62,14 +68,21 @@ public class ReservationController {
         return "pcms/reservation";
     }
 
+    // POST /pcms/reservations
     @PostMapping
-    public String createReservation(@Valid @ModelAttribute("reservationRequest") ReservationRequestDto reservationRequest,
-                                    BindingResult bindingResult,
-                                    Authentication authentication,
-                                    RedirectAttributes redirectAttributes) {
+    public String createReservation(
+            @Valid @ModelAttribute("reservationRequest")
+            ReservationRequestDto reservationRequest,
+            BindingResult bindingResult,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes
+    ) {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.reservationRequest", bindingResult);
+            redirectAttributes.addFlashAttribute(
+                    "org.springframework.validation.BindingResult.reservationRequest",
+                    bindingResult
+            );
             redirectAttributes.addFlashAttribute("reservationRequest", reservationRequest);
             return "redirect:/pcms/reservations?date=" + reservationRequest.getDate();
         }
@@ -85,18 +98,23 @@ public class ReservationController {
         return "redirect:/pcms/reservations?date=" + reservationRequest.getDate();
     }
 
+    // GET /pcms/reservations/my-reservations
     @GetMapping("/my-reservations")
     public String myReservationsPage(Authentication authentication, Model model) {
         String studentId = authentication.getName();
         model.addAttribute("myReservations", reservationService.findGroupedReservationsByStudentId(studentId));
-        return "pcms/my-reservations";
+        return "pcms/myReservations";
     }
 
+    // POST /pcms/reservations/report-return
     @PostMapping("/report-return")
-    public String reportReturn(@Valid @ModelAttribute ReturnReportDto dto,
-                               BindingResult bindingResult,
-                               Authentication authentication,
-                               RedirectAttributes redirectAttributes) {
+    public String reportReturn(
+            @Valid @ModelAttribute
+            ReturnReportDto dto,
+            BindingResult bindingResult,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes
+    ) {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", "作業報告は必須です。");
@@ -113,10 +131,14 @@ public class ReservationController {
         return "redirect:/pcms/reservations/my-reservations";
     }
 
+    // POST /pcms/reservations/cancel
     @PostMapping("/cancel")
-    public String cancelReservations(@RequestParam("reservationIds") String reservationIdsStr,
-                                     Authentication authentication,
-                                     RedirectAttributes redirectAttributes) {
+    public String cancelReservations(
+            @RequestParam("reservationIds")
+            String reservationIdsStr,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes
+    ) {
         try {
             List<Long> reservationIds;
             if (StringUtils.hasText(reservationIdsStr)) {
@@ -135,5 +157,5 @@ public class ReservationController {
         }
         return "redirect:/pcms/reservations/my-reservations";
     }
-}
 
+}

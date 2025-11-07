@@ -18,7 +18,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/pcms/admin")
@@ -40,12 +39,16 @@ public class AdminController {
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
         model.addAttribute("pendingReservations", reservationService.getPendingReservations());
-        return "pcms/admin-dashboard";
+        return "pcms/admin/admin-dashboard";
     }
 
     // POST /pcms/admin/reservations/approve
     @PostMapping("/reservations/approve")
-    public String approveReservation(@RequestParam("reservationIds") String reservationIdsStr, RedirectAttributes redirectAttributes) {
+    public String approveReservation(
+            @RequestParam("reservationIds")
+            String reservationIdsStr,
+            RedirectAttributes redirectAttributes
+    ) {
         try {
             List<Long> reservationIds = parseReservationIds(reservationIdsStr);
             reservationService.approveReservations(reservationIds);
@@ -58,7 +61,11 @@ public class AdminController {
 
     // POST /pcms/admin/reservations/deny
     @PostMapping("/reservations/deny")
-    public String denyReservation(@RequestParam("reservationIds") String reservationIdsStr, RedirectAttributes redirectAttributes) {
+    public String denyReservation(
+            @RequestParam("reservationIds")
+            String reservationIdsStr,
+            RedirectAttributes redirectAttributes
+    ) {
         try {
             List<Long> reservationIds = parseReservationIds(reservationIdsStr);
             reservationService.denyReservations(reservationIds);
@@ -73,7 +80,7 @@ public class AdminController {
         if (StringUtils.hasText(reservationIdsStr)) {
             return Arrays.stream(reservationIdsStr.split(","))
                     .map(Long::parseLong)
-                    .collect(Collectors.toList());
+                    .toList();
         }
         return Collections.emptyList();
     }
@@ -85,7 +92,7 @@ public class AdminController {
         model.addAttribute("pcs", pcRepository.findAll());
         model.addAttribute("users", userRepository.findByRole(User.UserRole.STUDENT));
         model.addAttribute("activeTransports", transportService.getActiveTransports());
-        return "pcms/admin-transport";
+        return "pcms/admin/admin-transport";
     }
 
 

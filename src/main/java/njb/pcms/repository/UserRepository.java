@@ -12,4 +12,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByRole(User.UserRole role);
 
+    List<User> findTop10ByStudentIdContainingOrNameContainingOrKanaContaining(
+            String studentId,
+            String name,
+            String kana
+    );
+
 }

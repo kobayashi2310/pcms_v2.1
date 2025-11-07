@@ -33,8 +33,13 @@ public class SecurityConfig {
                         .requestMatchers("/pcms/login").anonymous()
                         .requestMatchers("/", "/pcms", "/pcms/reservation").permitAll()
                         .requestMatchers("/pcms/reservations/myReservations", "/pcms/reservations/report-return/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/pcms/admin/reservations/approve", "/pcms/admin/reservations/deny", "/pcms/admin/reservations/").hasRole("ADMIN")
-                        .requestMatchers("/pcms/admin", "/pcms/admin/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/pcms/admin/reservations/approve",
+                                "/pcms/admin/reservations/deny",
+                                "/pcms/admin/reservations/"
+                        ).hasRole("ADMIN")
+                        .requestMatchers("/pcms/admin", "/pcms/admin/**", "/api/users/search").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form

@@ -27,7 +27,13 @@
           <a th:href="@{/pcms/reservations(date=${prevDate})}" class="btn btn-outline-light btn-sm">&lt; 前日</a>
           <form th:action="@{/pcms/reservations}" method="get" class="d-inline-block my-0">
             <label>
-              <input type="date" name="date" th:value="${#temporals.format(selectedDate, 'yyyy-MM-dd')}" onchange="this.form.submit()" class="form-control form-control-sm">
+              <input
+                  type="date"
+                  name="date"
+                  th:value="${#temporals.format(selectedDate, 'yyyy-MM-dd')}"
+                  onchange="this.form.submit()"
+                  class="form-control form-control-sm"
+              >
             </label>
           </form>
           <a th:href="@{/pcms/reservations(date=${nextDate})}" class="btn btn-outline-light btn-sm">翌日 &gt;</a>
@@ -55,9 +61,19 @@
               <td class="text-nowrap" th:text="${group.getPeriodRange()}"></td>
               <td>
                 <span th:switch="${group.status.name()}">
-                  <span th:case="'PENDING_APPROVAL'" class="badge bg-warning text-dark" th:text="${group.status.getDisplayName()}"></span>
-                  <span th:case="'APPROVED'" class="badge" style="background-color: var(--theme-color-secondary);" th:text="${group.status.getDisplayName()}"></span>
-                  <span th:case="'RETRACTED'" class="badge bg-secondary" th:text="${group.status.getDisplayName()}"></span>
+                  <span th:case="'PENDING_APPROVAL'"
+                        class="badge bg-warning text-dark"
+                        th:text="${group.status.getDisplayName()}"
+                  ></span>
+                  <span th:case="'APPROVED'"
+                        class="badge"
+                        style="background-color: var(--theme-color-secondary);"
+                        th:text="${group.status.getDisplayName()}"
+                  ></span>
+                  <span th:case="'RETRACTED'"
+                        class="badge bg-secondary"
+                        th:text="${group.status.getDisplayName()}"
+                  ></span>
                 </span>
               </td>
             </tr>
@@ -68,7 +84,11 @@
     </div>
 
     <div sec:authorize="isAuthenticated()" class="mb-4">
-      <button type="button" class="btn btn-primary btn-lg w-100" data-bs-toggle="modal" data-bs-target="#reservationModal">
+      <button type="button"
+              class="btn btn-primary btn-lg w-100"
+              data-bs-toggle="modal"
+              data-bs-target="#reservationModal"
+      >
         <i class="bi bi-calendar-plus-fill me-2"></i>新規予約申請を行う
       </button>
     </div>
@@ -83,7 +103,13 @@
 
   </div>
 
-  <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true" sec:authorize="isAuthenticated()">
+  <div class="modal fade"
+       id="reservationModal"
+       tabindex="-1"
+       aria-labelledby="reservationModalLabel"
+       aria-hidden="true"
+       sec:authorize="isAuthenticated()"
+  >
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <form th:action="@{/pcms/reservations}" th:object="${reservationRequest}" method="post">
@@ -95,11 +121,15 @@
           <div class="modal-body">
             <div class="mb-3">
               <label for="pcModal" class="form-label">PC</label>
-              <select class="form-select" id="pcModal" th:field="*{pcId}" th:classappend="${#fields.hasErrors('pcId')} ? 'is-invalid' : ''">
+              <select class="form-select"
+                      id="pcModal"
+                      th:field="*{pcId}"
+                      th:classappend="${#fields.hasErrors('pcId')} ? 'is-invalid' : ''"
+              >
                 <option value="">PCを選択してください</option>
                 <option th:each="pc : ${pcs}"
                         th:value="${pc.id}"
-                        th:text="${transportedPcIds.contains(pc.id)} ? pc.serialNumber + ' (故障対応中)' : pc.serialNumber"
+                        th:text="${transportedPcIds.contains(pc.id)} ? |${pc.serialNumber} (故障対応中)| : ${pc.serialNumber}"
                         th:disabled="${transportedPcIds.contains(pc.id)}"></option>
               </select>
               <div th:if="${#fields.hasErrors('pcId')}" class="invalid-feedback" th:errors="*{pcId}"></div>
@@ -107,7 +137,12 @@
 
             <div class="mb-3">
               <label for="dateModal" class="form-label">利用日</label>
-              <input type="date" class="form-control" id="dateModal" th:field="*{date}" th:classappend="${#fields.hasErrors('date')} ? 'is-invalid' : ''">
+              <input type="date"
+                     class="form-control"
+                     id="dateModal"
+                     th:field="*{date}"
+                     th:classappend="${#fields.hasErrors('date')} ? 'is-invalid' : ''"
+              >
               <div th:if="${#fields.hasErrors('date')}" class="invalid-feedback" th:errors="*{date}"></div>
             </div>
 
@@ -122,7 +157,12 @@
               <div th:classappend="${#fields.hasErrors('periodIds')} ? 'is-invalid' : ''">
                 <div class="form-check form-check-inline custom-checkbox-lg" th:each="p : ${periods}">
                   <label>
-                    <input class="form-check-input" type="checkbox" th:field="*{periodIds}" th:value="${p.period}" th:id="|modal-period-${p.period}|">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           th:field="*{periodIds}"
+                           th:value="${p.period}"
+                           th:id="|modal-period-${p.period}|"
+                    >
                   </label>
                   <label class="form-check-label" th:for="|modal-period-${p.period}|" th:text="${p.name}"></label>
                 </div>
@@ -132,7 +172,12 @@
 
             <div class="mb-3">
               <label for="reasonModal" class="form-label">利用目的</label>
-              <textarea class="form-control" id="reasonModal" rows="3" th:field="*{reason}" th:classappend="${#fields.hasErrors('reason')} ? 'is-invalid' : ''"></textarea>
+              <textarea class="form-control"
+                        id="reasonModal"
+                        rows="3"
+                        th:field="*{reason}"
+                        th:classappend="${#fields.hasErrors('reason')} ? 'is-invalid' : ''"
+              ></textarea>
               <div th:if="${#fields.hasErrors('reason')}" class="invalid-feedback" th:errors="*{reason}"></div>
             </div>
           </div>
