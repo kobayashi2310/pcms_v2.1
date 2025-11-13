@@ -101,18 +101,35 @@ public class AdminController {
     // POST /pcms/admin/transport
     @PostMapping("/transport")
     public String createTransport(
-            @Valid @ModelAttribute("newTransport") TransportRequestDto dto,
+            @Valid @ModelAttribute("newTransport")
+            TransportRequestDto dto,
             BindingResult bindingResult,
+            Model model,
             RedirectAttributes redirectAttributes)
     {
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.newTransport", bindingResult);
-            redirectAttributes.addFlashAttribute("newTransport", dto);
-            return "redirect:/pcms/admin/transport";
+            model.addAttribute("pcs", pcRepository.findAll());
+            model.addAttribute("users", userRepository.findAll());
+            model.addAttribute("activeTransports", transportService.getActiveTransports());
+            return "pcms/admin/admin-transport";
         }
         try {
             transportService.createTransport(dto);
             redirectAttributes.addFlashAttribute("successMessage", "PC持ち出しを登録しました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "処理に失敗しました: " + e.getMessage());
+        }
+        return "redirect:/pcms/admin/transport";
+    }
+    
+    @PostMapping("/transport/complete/{id}")
+    public String completeTransport(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            transportService.completeTransport(id);
+            redirectAttributes.addFlashAttribute("successMessage", "PCを返却済みにしました。");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "処理に失敗しました: " + e.getMessage());
         }

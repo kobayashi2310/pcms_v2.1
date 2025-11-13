@@ -129,7 +129,7 @@
                 <option value="">PCを選択してください</option>
                 <option th:each="pc : ${pcs}"
                         th:value="${pc.id}"
-                        th:text="|${transportedPcIds.contains(pc.id) ? pc.serialNumber + ' (故障対応中)' : pc.serialNumber}|"
+                        th:text="|${transportedPcIds.contains(pc.id) ? pc.serialNumber + ' (修理対応中)' : pc.serialNumber}|"
                         th:disabled="${transportedPcIds.contains(pc.id)}"></option>
               </select>
               <div th:if="${#fields.hasErrors('pcId')}" class="invalid-feedback" th:errors="*{pcId}"></div>
