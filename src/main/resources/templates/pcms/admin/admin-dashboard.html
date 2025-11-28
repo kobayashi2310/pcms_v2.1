@@ -1,89 +1,109 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
+      layout:decorate="~{layout/admin_layout}">
 <head>
-  <title>管理機能一覧</title>
-  <link rel="stylesheet" th:href="@{/css/pcms/reservation.css}">
+    <title>ダッシュボード</title>
 </head>
 <body>
-<main layout:fragment="content">
-  <div class="container py-4">
-    <h1 class="mb-4">管理機能一覧</h1>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">ダッシュボード</h1>
+    </div>
 
+    <!-- Alert Messages -->
     <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-      <span th:text="${successMessage}"></span>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-      <span th:text="${errorMessage}"></span>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
-    <div class="list-group mb-4">
-      <a th:href="@{/pcms/admin/dashboard}" class="list-group-item list-group-item-action active" aria-current="true">
-        <i class="bi bi-check2-circle me-2"></i>予約申請の承認・否認
-      </a>
-      <a th:href="@{/pcms/admin/transport}" class="list-group-item list-group-item-action">
-        <i class="bi bi-truck me-2"></i>PC持ち出し管理 (Transport)
-      </a>
-      <a th:href="@{/pcms/admin/transport/history}" class="list-group-item list-group-item-action">
-        <i class="bi bi-clock-history me-2"></i>PC持ち出し履歴
-      </a>
-      <a href="#" class="list-group-item list-group-item-action disabled">
-        <i class="bi bi-people-fill me-2"></i>ユーザー管理 (実装予定)
-      </a>
-      <a href="#" class="list-group-item list-group-item-action disabled">
-        <i class="bi bi-pc-display me-2"></i>PC管理 (実装予定)
-      </a>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <h2><i class="bi bi-clock-history me-2"></i>承認待ちの予約申請</h2>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive" style="overflow-x: auto;">
-          <table class="table table-hover" style="min-width: 900px;">
-            <thead>
-            <tr>
-              <th>申請日時</th>
-              <th>利用者</th>
-              <th>利用希望日</th>
-              <th>PC</th>
-              <th>利用時間帯</th>
-              <th>利用目的</th>
-              <th>操作</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:if="${#lists.isEmpty(pendingReservations)}">
-              <td colspan="7" class="text-center text-muted py-4">承認待ちの予約はありません。</td>
-            </tr>
-            <tr th:each="group : ${pendingReservations}">
-              <td class="text-nowrap" th:text="${#temporals.format(group.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
-              <td class="text-nowrap" th:text="${group.studentName}"></td>
-              <td class="text-nowrap" th:text="${group.date}"></td>
-              <td class="text-nowrap" th:text="${group.pcSerialNumber}"></td>
-              <td class="text-nowrap" th:text="${group.getPeriodRange()}"></td>
-              <td th:text="${group.reason}"></td>
-              <td class="text-nowrap">
-                <form th:action="@{/pcms/admin/reservations/approve}" method="post" class="d-inline">
-                  <input type="hidden" name="reservationIds" th:value="${#strings.listJoin(group.reservationIds, ',')}" />
-                  <button type="submit" class="btn btn-sm btn-success">承認</button>
-                </form>
-                <form th:action="@{/pcms/admin/reservations/deny}" method="post" class="d-inline">
-                  <input type="hidden" name="reservationIds" th:value="${#strings.listJoin(group.reservationIds, ',')}" />
-                  <button type="submit" class="btn btn-sm btn-danger">否認</button>
-                </form>
-              </td>
-            </tr>
-            </tbody>
-          </table>
+    <!-- Summary Cards (Placeholder) -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3 shadow-sm">
+                <div class="card-header">承認待ち件数</div>
+                <div class="card-body">
+                    <h5 class="card-title display-6" th:text="${pendingReservations.size()} + ' 件'">0 件</h5>
+                </div>
+            </div>
         </div>
-      </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3 shadow-sm">
+                <div class="card-header">本日の予約数</div>
+                <div class="card-body">
+                    <h5 class="card-title display-6">- 件</h5>
+                    <p class="card-text small">※実装予定</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3 shadow-sm">
+                <div class="card-header">持ち出し中PC</div>
+                <div class="card-body">
+                    <h5 class="card-title display-6">- 台</h5>
+                    <p class="card-text small">※実装予定</p>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</main>
+
+    <!-- Pending Reservations Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0"><i class="bi bi-clock-history me-2 text-warning"></i>承認待ちの予約申請</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">申請日時</th>
+                        <th>利用者</th>
+                        <th>利用希望日</th>
+                        <th>PC</th>
+                        <th>利用時間帯</th>
+                        <th>利用目的</th>
+                        <th class="text-end pe-4">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(pendingReservations)}">
+                        <td colspan="7" class="text-center text-muted py-5">
+                            <i class="bi bi-inbox display-4 d-block mb-3"></i>
+                            承認待ちの予約はありません。
+                        </td>
+                    </tr>
+                    <tr th:each="group : ${pendingReservations}">
+                        <td class="ps-4 text-nowrap" th:text="${#temporals.format(group.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
+                        <td class="fw-bold" th:text="${group.studentName}"></td>
+                        <td class="text-nowrap" th:text="${group.date}"></td>
+                        <td class="text-nowrap"><span class="badge bg-secondary" th:text="${group.pcSerialNumber}"></span></td>
+                        <td class="text-nowrap" th:text="${group.getPeriodRange()}"></td>
+                        <td class="text-truncate" style="max-width: 200px;" th:text="${group.reason}" th:title="${group.reason}"></td>
+                        <td class="text-end pe-4 text-nowrap">
+                            <form th:action="@{/pcms/admin/reservations/approve}" method="post" class="d-inline">
+                                <input type="hidden" name="reservationIds" th:value="${#strings.listJoin(group.reservationIds, ',')}" />
+                                <button type="submit" class="btn btn-sm btn-outline-success" title="承認">
+                                    <i class="bi bi-check-lg"></i> 承認
+                                </button>
+                            </form>
+                            <form th:action="@{/pcms/admin/reservations/deny}" method="post" class="d-inline ms-1">
+                                <input type="hidden" name="reservationIds" th:value="${#strings.listJoin(group.reservationIds, ',')}" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="否認" onclick="return confirm('本当に否認しますか？');">
+                                    <i class="bi bi-x-lg"></i> 否認
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -17,47 +17,48 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+	private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**", "/img/**", "/js/**").permitAll()
-                        .requestMatchers("/pcms/login").anonymous()
-                        .requestMatchers("/", "/pcms", "/pcms/reservation").permitAll()
-                        .requestMatchers("/pcms/reservations/myReservations", "/pcms/reservations/report-return/**").authenticated()
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/pcms/admin/reservations/approve",
-                                "/pcms/admin/reservations/deny",
-                                "/pcms/admin/reservations/",
-                                "/pcms/admin/transport/complete/**"
-                        ).hasRole("ADMIN")
-                        .requestMatchers("/pcms/admin", "/pcms/admin/**", "/api/users/search").hasRole("ADMIN")
-                        .anyRequest().permitAll()
-                )
-                .formLogin(form -> form
-                        .loginPage("/pcms/login")
-                        .usernameParameter("studentId")
-                        .passwordParameter("password")
-                        .loginProcessingUrl("/pcms/login")
-                        .successHandler(authenticationSuccessHandler)
-                        .failureUrl("/pcms/login?error=true")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/pcms/logout")
-                        .logoutSuccessUrl("/pcms")
-                        .permitAll()
-                );
-        return http.build();
-    }
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http
+				.cors(AbstractHttpConfigurer::disable)
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/css/**", "/js/**", "/img/**", "/webjars/**", "/fonts/**")
+						.permitAll()
+						.requestMatchers("/pcms/login").anonymous()
+						.requestMatchers("/", "/pcms", "/pcms/reservations").permitAll()
+						.requestMatchers("/pcms/reservations/my-reservations",
+								"/pcms/reservations/report-return/**")
+						.authenticated()
+						.requestMatchers(
+								HttpMethod.POST,
+								"/pcms/admin/reservations/approve",
+								"/pcms/admin/reservations/deny",
+								"/pcms/admin/reservations/",
+								"/pcms/admin/transport/complete/**")
+						.hasRole("ADMIN")
+						.requestMatchers("/pcms/admin", "/pcms/admin/**", "/api/users/search")
+						.hasRole("ADMIN")
+						.anyRequest().authenticated())
+				.formLogin(form -> form
+						.loginPage("/pcms/login")
+						.usernameParameter("studentId")
+						.passwordParameter("password")
+						.loginProcessingUrl("/pcms/login")
+						.successHandler(authenticationSuccessHandler)
+						.failureUrl("/pcms/login?error=true")
+						.permitAll())
+				.logout(logout -> logout
+						.logoutUrl("/pcms/logout")
+						.logoutSuccessUrl("/pcms")
+						.permitAll());
+		return http.build();
+	}
 
 }

@@ -37,7 +37,8 @@ public class TransportService {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("ユーザーが見つかりません"));
 
-        boolean isAlreadyTransported = transportRepository.existsByPc_IdAndStatus(pc.getId(), Transport.TransportStatus.IN_PROGRESS);
+        boolean isAlreadyTransported = transportRepository.existsByPc_IdAndStatus(pc.getId(),
+                Transport.TransportStatus.IN_PROGRESS);
         if (isAlreadyTransported) {
             throw new IllegalArgumentException("このPCは既に持ち出し中です");
         }
@@ -64,6 +65,13 @@ public class TransportService {
         transport.setStatus(Transport.TransportStatus.COMPLETED);
         transport.setReturnedAt(LocalDateTime.now());
         transportRepository.save(transport);
+    }
+
+    public java.util.Set<Long> getTransportedPcIds() {
+        return transportRepository.findByStatus(Transport.TransportStatus.IN_PROGRESS)
+                .stream()
+                .map(transport -> transport.getPc().getId())
+                .collect(java.util.stream.Collectors.toSet());
     }
 
 }

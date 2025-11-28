@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const query = userSearchInput.value;
       clearTimeout(searchTimeout);
 
-      if (query.length < 2) {
+      if (query.length < 1) {
         userSearchResults.innerHTML = '';
         userIdInput.value = '';
         activeIndex = -1;
@@ -106,17 +106,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     userIdInput.value = user.id;
                     userSearchInput.value = a.getAttribute('data-user-name');
                     userSearchResults.innerHTML = '';
+                    userSearchResults.style.display = 'none';
                     activeIndex = -1;
                   });
                   userSearchResults.appendChild(a);
                 });
+                userSearchResults.style.display = 'block';
               } else {
                 userSearchResults.innerHTML = '<span class="list-group-item">該当する学生が見つかりません。</span>';
+                userSearchResults.style.display = 'block';
               }
             })
             .catch(error => {
               console.error('Error fetching users:', error);
               userSearchResults.innerHTML = '<span class="list-group-item text-danger">検索エラーが発生しました。</span>';
+              userSearchResults.style.display = 'block';
             });
       }, 300);
     });
@@ -124,6 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('click', function (e) {
       if (!userSearchInput.contains(e.target) && !userSearchResults.contains(e.target)) {
         userSearchResults.innerHTML = '';
+        userSearchResults.style.display = 'none';
         activeIndex = -1;
       }
     });

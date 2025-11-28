@@ -2,99 +2,96 @@ package njb.pcms.controller.pcms;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import njb.pcms.constant.FlashMessages;
+import njb.pcms.constant.UrlPaths;
+import njb.pcms.constant.ViewNames;
 import njb.pcms.dto.pcms.admin.TransportRequestDto;
 import njb.pcms.model.User;
-import njb.pcms.repository.PcRepository;
-import njb.pcms.repository.UserRepository;
+import njb.pcms.service.PcService;
 import njb.pcms.service.ReservationService;
 import njb.pcms.service.TransportService;
+import njb.pcms.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Arrays;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
 
 @Controller
-@RequestMapping("/pcms/admin")
+@RequestMapping(UrlPaths.PCMS_ADMIN)
 @RequiredArgsConstructor
 public class AdminController {
 
     private final ReservationService reservationService;
-    private final PcRepository pcRepository;
-    private final UserRepository userRepository;
+    private final PcService pcService;
+    private final UserService userService;
     private final TransportService transportService;
+
+    @ModelAttribute("requestURI")
+    public String requestURI(HttpServletRequest request) {
+        return request.getRequestURI();
+    }
 
     // GET /pcms/admin
     @GetMapping
     public String adminRoot() {
-        return "redirect:/pcms/admin/dashboard";
+        return ViewNames.REDIRECT_PCMS_ADMIN_RESERVATIONS;
     }
 
     // GET /pcms/admin/dashboard
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
         model.addAttribute("pendingReservations", reservationService.getPendingReservations());
-        return "pcms/admin/admin-dashboard";
+        return ViewNames.PCMS_ADMIN_RESERVATIONS;
     }
 
     // POST /pcms/admin/reservations/approve
     @PostMapping("/reservations/approve")
     public String approveReservation(
-            @RequestParam("reservationIds")
-            String reservationIdsStr,
-            RedirectAttributes redirectAttributes
-    ) {
+            @RequestParam(name = "reservationIds", required = false) List<Long> reservationIds,
+            RedirectAttributes redirectAttributes) {
         try {
-            List<Long> reservationIds = parseReservationIds(reservationIdsStr);
+            if (reservationIds == null) {
+                reservationIds = Collections.emptyList();
+            }
             reservationService.approveReservations(reservationIds);
-            redirectAttributes.addFlashAttribute("successMessage", "予約を承認しました。");
+            redirectAttributes.addFlashAttribute(FlashMessages.KEY_SUCCESS, FlashMessages.MSG_RESERVATION_APPROVED);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "承認処理に失敗しました: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(FlashMessages.KEY_ERROR, "承認処理に失敗しました: " + e.getMessage());
         }
-        return "redirect:/pcms/admin/dashboard";
+        return ViewNames.REDIRECT_PCMS_ADMIN_RESERVATIONS;
     }
 
     // POST /pcms/admin/reservations/deny
     @PostMapping("/reservations/deny")
     public String denyReservation(
-            @RequestParam("reservationIds")
-            String reservationIdsStr,
-            RedirectAttributes redirectAttributes
-    ) {
+            @RequestParam(name = "reservationIds", required = false) List<Long> reservationIds,
+            RedirectAttributes redirectAttributes) {
         try {
-            List<Long> reservationIds = parseReservationIds(reservationIdsStr);
+            if (reservationIds == null) {
+                reservationIds = Collections.emptyList();
+            }
             reservationService.denyReservations(reservationIds);
-            redirectAttributes.addFlashAttribute("successMessage", "予約を否認しました。");
+            redirectAttributes.addFlashAttribute(FlashMessages.KEY_SUCCESS, FlashMessages.MSG_RESERVATION_DENIED);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "否認処理に失敗しました: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(FlashMessages.KEY_ERROR, "否認処理に失敗しました: " + e.getMessage());
         }
-        return "redirect:/pcms/admin/dashboard";
-    }
-
-    private List<Long> parseReservationIds(String reservationIdsStr) {
-        if (StringUtils.hasText(reservationIdsStr)) {
-            return Arrays.stream(reservationIdsStr.split(","))
-                    .map(Long::parseLong)
-                    .toList();
-        }
-        return Collections.emptyList();
+        return ViewNames.REDIRECT_PCMS_ADMIN_RESERVATIONS;
     }
 
     // GET /pcms/admin/transport
     @GetMapping("/transport")
     public String showTransportPage(Model model) {
         model.addAttribute("newTransport", new TransportRequestDto());
-        model.addAttribute("pcs", pcRepository.findAll());
-        model.addAttribute("users", userRepository.findByRole(User.UserRole.STUDENT));
+        model.addAttribute("pcs", pcService.findAll());
+        model.addAttribute("users", userService.findByRole(User.UserRole.STUDENT));
         model.addAttribute("activeTransports", transportService.getActiveTransports());
-        return "pcms/admin/admin-transport";
+        return ViewNames.PCMS_ADMIN_TRANSPORT;
     }
-
 
     // TODO 持ち出し開始日、終了時の設定をする。ユーザー検索機能の追加
 
@@ -110,34 +107,33 @@ public class AdminController {
     public String createTransport(
             @Valid @ModelAttribute("newTransport") TransportRequestDto dto,
             BindingResult bindingResult,
-            RedirectAttributes redirectAttributes)
-    {
+            RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.newTransport", bindingResult);
+            redirectAttributes.addFlashAttribute(FlashMessages.KEY_BINDING_RESULT_PREFIX + "newTransport",
+                    bindingResult);
             redirectAttributes.addFlashAttribute("newTransport", dto);
         }
         try {
             transportService.createTransport(dto);
-            redirectAttributes.addFlashAttribute("successMessage", "PC持ち出しを登録しました。");
+            redirectAttributes.addFlashAttribute(FlashMessages.KEY_SUCCESS, "PC持ち出しを登録しました。");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "処理に失敗しました: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(FlashMessages.KEY_ERROR, "処理に失敗しました: " + e.getMessage());
         }
-        return "redirect:/pcms/admin/transport";
+        return ViewNames.REDIRECT_PCMS_ADMIN_TRANSPORT;
     }
 
     // POST /transport/complete/{id}
     @PostMapping("/transport/complete/{id}")
     public String completeTransport(
             @PathVariable Long id,
-            RedirectAttributes redirectAttributes
-    ) {
+            RedirectAttributes redirectAttributes) {
         try {
             transportService.completeTransport(id);
-            redirectAttributes.addFlashAttribute("successMessage", "PCを返却済みにしました。");
+            redirectAttributes.addFlashAttribute(FlashMessages.KEY_SUCCESS, FlashMessages.MSG_TRANSPORT_COMPLETED);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "処理に失敗しました: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(FlashMessages.KEY_ERROR, "処理に失敗しました: " + e.getMessage());
         }
-        return "redirect:/pcms/admin/transport";
+        return ViewNames.REDIRECT_PCMS_ADMIN_TRANSPORT;
     }
 
 }

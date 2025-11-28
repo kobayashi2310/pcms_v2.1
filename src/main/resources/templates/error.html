@@ -3,18 +3,18 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
-    <title th:text="${pageTitle}">エラー</title>
+    <title>エラー</title>
 </head>
 <body>
 <main layout:fragment="content">
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-8 offset-md-2 text-center">
-                <h1 class="display-4" th:text="${pageTitle}">Error</h1>
-                <p class="lead" th:text="${errorMessage}">エラーが発生しました。</p>
+                <h1 class="display-4" th:text="${status} + ' ' + ${error}">Error</h1>
+                <p class="lead" th:text="${message}">予期せぬエラーが発生しました。</p>
                 <hr>
                 <p>
-                    URLをご確認いただくか、以下のボタンからホームページへお戻りください。
+                    以下のボタンからホームページへお戻りください。
                 </p>
                 <a th:href="@{/pcms}" class="btn btn-primary">ホームページへ戻る</a>
             </div>
