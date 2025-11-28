@@ -37,7 +37,8 @@ public class SecurityConfig {
                                 HttpMethod.POST,
                                 "/pcms/admin/reservations/approve",
                                 "/pcms/admin/reservations/deny",
-                                "/pcms/admin/reservations/"
+                                "/pcms/admin/reservations/",
+                                "/pcms/admin/transport/complete/**"
                         ).hasRole("ADMIN")
                         .requestMatchers("/pcms/admin", "/pcms/admin/**", "/api/users/search").hasRole("ADMIN")
                         .anyRequest().permitAll()

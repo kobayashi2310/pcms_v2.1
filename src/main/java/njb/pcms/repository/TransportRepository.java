@@ -17,6 +17,8 @@ public interface TransportRepository extends JpaRepository<Transport, Long> {
 
     boolean existsByPc_IdAndStatus(Long pcId, Transport.TransportStatus status);
 
+    boolean existsByUser_IdAndStatus(Long userId, Transport.TransportStatus status);
+
     /**
      * 指定されたPC ID、ステータス、作成日、および予想返却日の条件に該当する輸送レコードが存在するかどうかを確認します。
      * レコードは、指定されたステータスに一致し、指定された作成日以前に作成され、予想返却日が指定された返却日以降である必要があります。
