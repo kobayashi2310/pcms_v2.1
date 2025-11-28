@@ -11,6 +11,7 @@ import njb.pcms.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,10 +21,14 @@ public class TransportService {
 
     private final TransportRepository transportRepository;
     private final PcRepository pcRepository;
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public List<Transport> getActiveTransports() {
         return transportRepository.findByStatus(Transport.TransportStatus.IN_PROGRESS);
+    }
+
+    public List<Transport> getAllTransportHistory() {
+        return transportRepository.findAllByOrderByCreatedAtDesc();
     }
 
     public void createTransport(TransportRequestDto dto) {
@@ -45,6 +50,19 @@ public class TransportService {
         transport.setExpectedReturnDate(dto.getExpectedReturnDate());
         transport.setStatus(Transport.TransportStatus.IN_PROGRESS);
 
+        transportRepository.save(transport);
+    }
+
+    public void completeTransport(Long id) {
+        Transport transport = transportRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("該当の持ち出し記録が見つかりません"));
+
+        if (transport.getStatus() == Transport.TransportStatus.COMPLETED) {
+            throw new IllegalArgumentException("このPCは既に返却済みとしてマークされています");
+        }
+
+        transport.setStatus(Transport.TransportStatus.COMPLETED);
+        transport.setReturnedAt(LocalDateTime.now());
         transportRepository.save(transport);
     }
 

@@ -13,6 +13,8 @@ public interface TransportRepository extends JpaRepository<Transport, Long> {
 
     List<Transport> findByStatus(Transport.TransportStatus status);
 
+    List<Transport> findAllByOrderByCreatedAtDesc();
+
     boolean existsByPc_IdAndStatus(Long pcId, Transport.TransportStatus status);
 
     /**

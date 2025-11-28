@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security6"
-      layout:decorate="~{layout/layout}">
+      layout:decorate="~{layout/layout}"
+>
 <head>
   <title>PC予約</title>
   <link rel="stylesheet" th:href="@{/css/pcms/reservation.css}">
@@ -129,7 +131,7 @@
                 <option value="">PCを選択してください</option>
                 <option th:each="pc : ${pcs}"
                         th:value="${pc.id}"
-                        th:text="${transportedPcIds.contains(pc.id)} ? |${pc.serialNumber} (故障対応中)| : ${pc.serialNumber}"
+                        th:text="|${transportedPcIds.contains(pc.id) ? pc.serialNumber + ' (故障対応中)' : pc.serialNumber}|"
                         th:disabled="${transportedPcIds.contains(pc.id)}"></option>
               </select>
               <div th:if="${#fields.hasErrors('pcId')}" class="invalid-feedback" th:errors="*{pcId}"></div>

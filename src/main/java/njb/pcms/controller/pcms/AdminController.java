@@ -98,6 +98,13 @@ public class AdminController {
 
     // TODO 持ち出し開始日、終了時の設定をする。ユーザー検索機能の追加
 
+    // GET /pcms/admin/transport/history
+    @GetMapping("/transport/history")
+    public String showTransportHistoryPage(Model model) {
+        model.addAttribute("transports", transportService.getAllTransportHistory());
+        return "pcms/admin/admin-transport-history";
+    }
+
     // POST /pcms/admin/transport
     @PostMapping("/transport")
     public String createTransport(
@@ -108,11 +115,25 @@ public class AdminController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.newTransport", bindingResult);
             redirectAttributes.addFlashAttribute("newTransport", dto);
-            return "redirect:/pcms/admin/transport";
         }
         try {
             transportService.createTransport(dto);
             redirectAttributes.addFlashAttribute("successMessage", "PC持ち出しを登録しました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "処理に失敗しました: " + e.getMessage());
+        }
+        return "redirect:/pcms/admin/transport";
+    }
+
+    // POST /transport/complete/{id}
+    @PostMapping("/transport/complete/{id}")
+    public String completeTransport(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            transportService.completeTransport(id);
+            redirectAttributes.addFlashAttribute("successMessage", "PCを返却済みにしました。");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "処理に失敗しました: " + e.getMessage());
         }

@@ -14,12 +14,13 @@
           top: 100%;
           left: 0;
           right: 0;
-          z-index: 1050;
+          z-index: 2000;
           max-height: 200px;
           overflow-y: auto;
           border: 1px solid #dee2e6;
           border-top: none;
           border-radius: 0 0 0.375rem 0.375rem;
+          background-color: white;
       }
       #userSearchResults .list-group-item-action.active {
           background-color: #0d6efd;
@@ -33,6 +34,23 @@
   <div class="container py-4">
     <h1 class="mb-4">PC持ち出し管理</h1>
 
+    <!-- 管理画面共通ナビゲーション -->
+    <ul class="nav nav-tabs mb-4">
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/pcms/admin/dashboard}">ダッシュボード</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="#">PC持ち出し管理</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/pcms/admin/transport/history}">PC持ち出し履歴</a>
+      </li>
+    </ul>
+
+    <p class="text-muted">
+      学生のPC故障時の代替機対応や、卒業研究・イベント等での長期間のPC持ち出しを管理する画面です。
+    </p>
+
     <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
       <span th:text="${successMessage}"></span>
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -42,59 +60,16 @@
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
-    <div class="card mb-4">
-      <div class="card-header">
-        <h2>新規持ち出し登録</h2>
-      </div>
-      <div class="card-body">
-        <form th:action="@{/pcms/admin/transport}" th:object="${newTransport}" method="post">
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="pcId" class="form-label">PC</label>
-              <select id="pcId" class="form-select" th:field="*{pcId}" th:classappend="${#fields.hasErrors('pcId')} ? 'is-invalid' : ''">
-                <option value="">PCを選択してください</option>
-                <option th:each="pc : ${pcs}" th:value="${pc.id}" th:text="${pc.serialNumber}"></option>
-              </select>
-              <div th:if="${#fields.hasErrors('pcId')}" class="invalid-feedback" th:errors="*{pcId}"></div>
-            </div>
-
-            <div class="col-md-6 mb-3 search-results-container">
-              <label for="userSearch" class="form-label">学生</label>
-              <input type="text" id="userSearch" class="form-control" placeholder="学籍番号または名前で検索..."
-                     autocomplete="off" th:classappend="${#fields.hasErrors('userId')} ? 'is-invalid' : ''">
-              <div id="userSearchResults" class="list-group"></div>
-              <input type="hidden" id="userId" th:field="*{userId}">
-              <div th:if="${#fields.hasErrors('userId')}" class="invalid-feedback d-block" th:errors="*{userId}"></div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="destination" class="form-label">持ち出し先</label>
-              <input type="text" id="destination" class="form-control" th:field="*{destination}" th:classappend="${#fields.hasErrors('destination')} ? 'is-invalid' : ''">
-              <div th:if="${#fields.hasErrors('destination')}" class="invalid-feedback" th:errors="*{destination}"></div>
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="expectedReturnDate" class="form-label">返却予定日</label>
-              <input type="date" id="expectedReturnDate" class="form-control" th:field="*{expectedReturnDate}" th:classappend="${#fields.hasErrors('expectedReturnDate')} ? 'is-invalid' : ''">
-              <div th:if="${#fields.hasErrors('expectedReturnDate')}" class="invalid-feedback" th:errors="*{expectedReturnDate}"></div>
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="reason" class="form-label">理由（故障内容など）</label>
-            <textarea id="reason" class="form-control" rows="3" th:field="*{reason}" th:classappend="${#fields.hasErrors('reason')} ? 'is-invalid' : ''"></textarea>
-            <div th:if="${#fields.hasErrors('reason')}" class="invalid-feedback" th:errors="*{reason}"></div>
-          </div>
-          <button type="submit" class="btn btn-primary">登録する</button>
-        </form>
-      </div>
+    <!-- 新規登録ボタン -->
+    <div class="mb-4 text-end">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transportModal">
+        <i class="bi bi-plus-circle me-2"></i>新規持ち出し登録
+      </button>
     </div>
 
     <div class="card">
       <div class="card-header">
-        <h2>現在持ち出し中のPC</h2>
+        <h2>持ち出し中のPC</h2>
       </div>
       <div class="card-body">
         <div class="table-responsive">
@@ -102,10 +77,10 @@
             <thead>
             <tr>
               <th>PC</th>
-              <th>持ち出し者</th>
+              <th>学生</th>
               <th>持ち出し先</th>
               <th>理由</th>
-              <th>持ち出し開始日</th>
+              <th>開始日</th>
               <th>返却予定日</th>
               <th>操作</th>
             </tr>
@@ -122,7 +97,11 @@
               <td th:text="${#temporals.format(transport.createdAt, 'yyyy/MM/dd')}"></td>
               <td th:text="${#temporals.format(transport.expectedReturnDate, 'yyyy/MM/dd')}"></td>
               <td>
-                <button class="btn btn-sm btn-outline-success" disabled>返却完了</button>
+                <form th:action="@{/pcms/admin/transport/complete/{id}(id=${transport.id})}" method="post"
+                      onsubmit="return confirm('PCが返却されましたか？');">
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                  <button type="submit" class="btn btn-sm btn-outline-success">返却済みにする</button>
+                </form>
               </td>
             </tr>
             </tbody>
@@ -131,10 +110,73 @@
       </div>
     </div>
   </div>
-  <th:block layout:fragment="script">
-    <script th:src="@{/js/admin-transport.js}" defer></script>
-  </th:block>
+
+  <!-- 新規持ち出し登録モーダル -->
+  <div class="modal fade" id="transportModal" tabindex="-1" aria-labelledby="transportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="transportModalLabel">新規持ち出し登録</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form th:action="@{/pcms/admin/transport}" th:object="${newTransport}" method="post" id="transportForm">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="pcId" class="form-label">持ち出しPC</label>
+                <select id="pcId" class="form-select" th:field="*{pcId}" th:classappend="${#fields.hasErrors('pcId')} ? 'is-invalid' : ''">
+                  <option value="">PCを選択してください</option>
+                  <option th:each="pc : ${pcs}" th:value="${pc.id}" th:text="${pc.serialNumber}"></option>
+                </select>
+                <div th:if="${#fields.hasErrors('pcId')}" class="invalid-feedback" th:errors="*{pcId}"></div>
+              </div>
+
+              <div class="col-md-6 mb-3 search-results-container">
+                <label for="userSearch" class="form-label">利用学生</label>
+                <input type="text" id="userSearch" class="form-control" placeholder="学籍番号、名前、カナで検索..."
+                       autocomplete="off" th:classappend="${#fields.hasErrors('userId')} ? 'is-invalid' : ''">
+                <div id="userSearchResults" class="list-group"></div>
+                <input type="hidden" id="userId" th:field="*{userId}">
+                <div th:if="${#fields.hasErrors('userId')}" class="invalid-feedback d-block" th:errors="*{userId}"></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="destination" class="form-label">持ち出し先</label>
+                <input type="text" id="destination" class="form-control" th:field="*{destination}" placeholder="例: 自宅、研究室、実家など" th:classappend="${#fields.hasErrors('destination')} ? 'is-invalid' : ''">
+                <div th:if="${#fields.hasErrors('destination')}" class="invalid-feedback" th:errors="*{destination}"></div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="expectedReturnDate" class="form-label">返却予定日</label>
+                <input type="date" id="expectedReturnDate" class="form-control" th:field="*{expectedReturnDate}" th:classappend="${#fields.hasErrors('expectedReturnDate')} ? 'is-invalid' : ''">
+                <div th:if="${#fields.hasErrors('expectedReturnDate')}" class="invalid-feedback" th:errors="*{expectedReturnDate}"></div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="reason" class="form-label">持ち出し理由</label>
+              <textarea id="reason" class="form-control" rows="3" th:field="*{reason}" placeholder="例: 画面割れのためメーカー修理に出す / 卒業研究での利用のため" th:classappend="${#fields.hasErrors('reason')} ? 'is-invalid' : ''"></textarea>
+              <div th:if="${#fields.hasErrors('reason')}" class="invalid-feedback" th:errors="*{reason}"></div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+          <button type="submit" form="transportForm" class="btn btn-primary">登録する</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </main>
+
+<th:block layout:fragment="script">
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    const hasErrors = /*[[${#fields.hasErrors('newTransport.*')}]]*/ false;
+    /*]]>*/
+  </script>
+  <script th:src="@{/js/admin-transport.js}" defer></script>
+</th:block>
 </body>
 </html>
-
