@@ -81,7 +81,7 @@ public class ReservationService {
     public void createReservation(ReservationRequestDto dto, String studentId) {
         User user = userRepository.findByStudentId(studentId)
                 .orElseThrow(() -> new IllegalArgumentException("指定された学生IDのユーザーが見つかりません。"));
-        Pc pc = pcRepository.findById(dto.getPcId())
+        Pc pc = pcRepository.findById(Objects.requireNonNull(dto.getPcId()))
                 .orElseThrow(() -> new IllegalArgumentException("指定されたPCが見つかりません。"));
 
         boolean isTransported = transportRepository
@@ -112,7 +112,7 @@ public class ReservationService {
 
         List<Reservation> reservationsToSave = new ArrayList<>();
         for (Byte periodId : periodIds) {
-            Period period = periodRepository.findById(periodId)
+            Period period = periodRepository.findById(Objects.requireNonNull(periodId))
                     .orElseThrow(() -> new IllegalArgumentException("ID: " + periodId + " の時限が見つかりません。"));
 
             boolean isAlreadyBooked = reservationRepository.existsByPc_IdAndDateAndPeriod_Period(pc.getId(),
@@ -162,7 +162,7 @@ public class ReservationService {
 
         List<Reservation> reservationsToUpdate = new ArrayList<>();
         for (Long reservationId : dto.getReservationIds()) {
-            Reservation reservation = reservationRepository.findById(reservationId)
+            Reservation reservation = reservationRepository.findById(Objects.requireNonNull(reservationId))
                     .orElseThrow(() -> new IllegalArgumentException("指定された予約が見つかりません。ID:" + reservationId));
 
             if (!reservation.getUser().getStudentId().equals(studentId)) {
@@ -193,7 +193,7 @@ public class ReservationService {
 
         List<Reservation> reservationsToDelete = new ArrayList<>();
         for (Long reservationId : reservationIds) {
-            Reservation reservation = reservationRepository.findById(reservationId)
+            Reservation reservation = reservationRepository.findById(Objects.requireNonNull(reservationId))
                     .orElseThrow(() -> new IllegalArgumentException("指定された予約が見つかりません"));
 
             if (!reservation.getUser().getStudentId().equals(studentId)) {
@@ -223,7 +223,7 @@ public class ReservationService {
         }
         List<Reservation> reservationsToApprove = new ArrayList<>();
         for (Long id : reservationIds) {
-            Reservation reservation = reservationRepository.findById(id)
+            Reservation reservation = reservationRepository.findById(Objects.requireNonNull(id))
                     .orElseThrow(() -> new IllegalArgumentException("指定された予約が見つかりません。ID: " + id));
 
             if (reservation.getStatus() != PENDING_APPROVAL) {
@@ -247,7 +247,7 @@ public class ReservationService {
         }
         List<Reservation> reservationsToDeny = new ArrayList<>();
         for (Long id : reservationIds) {
-            Reservation reservation = reservationRepository.findById(id)
+            Reservation reservation = reservationRepository.findById(Objects.requireNonNull(id))
                     .orElseThrow(() -> new IllegalArgumentException("指定された予約が見つかりません。ID: " + id));
 
             if (reservation.getStatus() != PENDING_APPROVAL) {

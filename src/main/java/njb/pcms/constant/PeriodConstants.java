@@ -8,7 +8,7 @@ public class PeriodConstants {
     public static final byte PERIOD_3 = 3;
     public static final byte PERIOD_4 = 4;
 
-    public static final Set<Byte> ALL_PERIODS = Set.of(PERIOD_1, PERIOD_2, PERIOD_4);
+    public static final Set<Byte> ALL_PERIODS = Set.of(PERIOD_1, PERIOD_2, PERIOD_3, PERIOD_4);
 
     private PeriodConstants() {
         // Private constructor to prevent instantiation

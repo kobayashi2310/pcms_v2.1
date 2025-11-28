@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional
@@ -32,9 +33,9 @@ public class TransportService {
     }
 
     public void createTransport(TransportRequestDto dto) {
-        Pc pc = pcRepository.findById(dto.getPcId())
+        Pc pc = pcRepository.findById(Objects.requireNonNull(dto.getPcId()))
                 .orElseThrow(() -> new IllegalArgumentException("PCが見つかりません"));
-        User user = userRepository.findById(dto.getUserId())
+        User user = userRepository.findById(Objects.requireNonNull(dto.getUserId()))
                 .orElseThrow(() -> new IllegalArgumentException("ユーザーが見つかりません"));
 
         boolean isAlreadyTransported = transportRepository.existsByPc_IdAndStatus(pc.getId(),
@@ -55,7 +56,7 @@ public class TransportService {
     }
 
     public void completeTransport(Long id) {
-        Transport transport = transportRepository.findById(id)
+        Transport transport = transportRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new IllegalArgumentException("該当の持ち出し記録が見つかりません"));
 
         if (transport.getStatus() == Transport.TransportStatus.COMPLETED) {
