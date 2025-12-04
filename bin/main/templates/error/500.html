@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>サーバーエラー</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2 text-center">
+                <h1 class="display-1">500</h1>
+                <h2 class="display-4">Internal Server Error</h2>
+                <p class="lead mt-4">サーバー内部でエラーが発生しました。</p>
+                <p>
+                    しばらく時間をおいてから再度アクセスしてください。<br>
+                    問題が解決しない場合は、管理者にお問い合わせください。
+                </p>
+                <hr>
+                <a th:href="@{/pcms}" class="btn btn-primary mt-3">ホームページへ戻る</a>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

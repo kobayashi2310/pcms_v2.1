@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin_layout}">
+<head>
+    <title>PC持ち出し管理</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">PC持ち出し管理</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transportModal">
+                <i class="bi bi-plus-circle me-2"></i>新規持ち出し登録
+            </button>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Active Transports List -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0"><i class="bi bi-list-ul me-2 text-success"></i>持ち出し中一覧</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">PC</th>
+                        <th>利用者</th>
+                        <th>持ち出し日時</th>
+                        <th>返却予定</th>
+                        <th class="text-end pe-4">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(activeTransports)}">
+                        <td colspan="5" class="text-center text-muted py-5">
+                            持ち出し中のPCはありません。
+                        </td>
+                    </tr>
+                    <tr th:each="transport : ${activeTransports}">
+                        <td class="ps-4 fw-bold" th:text="${transport.pc.serialNumber}"></td>
+                        <td>
+                            <div th:text="${transport.user.name}"></div>
+                            <small class="text-muted" th:text="${transport.user.studentId}"></small>
+                        </td>
+                        <td th:text="${#temporals.format(transport.createdAt, 'MM/dd HH:mm')}"></td>
+                        <td th:text="${#temporals.format(transport.expectedReturnDate, 'MM/dd HH:mm')}"></td>
+                        <td class="text-end pe-4">
+                            <form th:action="@{/pcms/admin/transport/complete/{id}(id=${transport.id})}" method="post">
+                                <button type="submit" class="btn btn-sm btn-outline-primary" onclick="return confirm('返却処理を行いますか？');">
+                                    <i class="bi bi-box-arrow-in-down-left me-1"></i>返却
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Transport Modal -->
+    <div class="modal fade" id="transportModal" tabindex="-1" aria-labelledby="newTransportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newTransportModalLabel">新規持ち出し登録</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/pcms/admin/transport}" th:object="${newTransport}" method="post" id="transportForm">
+                        <div class="form-floating mb-3">
+                            <select class="form-select" id="pcId" th:field="*{pcId}" required>
+                                <option value="" selected>選択してください</option>
+                                <option th:each="pc : ${pcs}" th:value="${pc.id}" th:text="${pc.serialNumber}"></option>
+                            </select>
+                            <label for="pcId">PCシリアル番号</label>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('pcId')}" th:errors="*{pcId}"></div>
+                        </div>
+
+                        <div class="form-floating mb-3 position-relative">
+                            <input type="text" class="form-control" id="userSearch" placeholder="利用者検索" autocomplete="off">
+                            <label for="userSearch">利用者検索 (名前または学籍番号)</label>
+                            <input type="hidden" id="userId" th:field="*{userId}">
+                            <div id="userSearchResults" class="list-group position-absolute w-100 shadow" style="z-index: 1050; max-height: 200px; overflow-y: auto; display: none;"></div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}" style="display: block;"></div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="datetime-local" class="form-control" id="expectedReturnDate" th:field="*{expectedReturnDate}" required>
+                            <label for="expectedReturnDate">返却予定日時</label>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('expectedReturnDate')}" th:errors="*{expectedReturnDate}"></div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="destination" th:field="*{destination}" placeholder="持ち出し先" required>
+                            <label for="destination">持ち出し先</label>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('destination')}" th:errors="*{destination}"></div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" id="reason" th:field="*{reason}" style="height: 100px" placeholder="利用目的" required></textarea>
+                            <label for="reason">利用目的</label>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('reason')}" th:errors="*{reason}"></div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-2"></i>登録する
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Flag for JS -->
+    <script th:if="${#fields.hasErrors('${newTransport.*}')}">
+        var hasErrors = true;
+    </script>
+    <script th:unless="${#fields.hasErrors('${newTransport.*}')}">
+        var hasErrors = false;
+    </script>
+
+    <!-- External JS -->
+    <script th:src="@{/js/admin-transport.js}"></script>
+</div>
+</div>
+</body>
+</html>

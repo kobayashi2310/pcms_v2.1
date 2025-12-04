@@ -19,6 +19,9 @@ import java.util.stream.Collectors;
 
 import static njb.pcms.model.Reservation.ReservationStatus.*;
 
+/**
+ * 予約を管理し、作成、キャンセル、グループ化、返品レポートなどの関連操作を処理するためのサービスクラス
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -73,10 +76,15 @@ public class ReservationService {
     }
 
     /**
-     * 新しい予約を作成します。
+     * 学生によるコンピュータ（PC）の予約を、指定された日時で作成します。
+     * このメソッドは、要求された時間帯にPCが既に予約されていないこと、メンテナンス中ではないこと、または移動中でないことを確認します。
+     * また、要求された期間が連続していること、および必要なデータが存在することも検証します。
      * 
-     * @param dto       予約リクエスト情報
-     * @param studentId 予約者の学籍番号
+     * @param dto       PC ID、日付、期間、理由などの予約の詳細を含むデータ転送オブジェクト
+     * @param studentId 予約が作成される一意の学生ID。これは予約を行う学生を識別するために使用されます。
+     * @throws IllegalArgumentException 学生IDが無効、PC IDが無効、
+     *                                  指定された時間にPCが利用できない、
+     *                                  期間が連続していない、または必要なエンティティが存在しない場合。
      */
     public void createReservation(ReservationRequestDto dto, String studentId) {
         User user = userRepository.findByStudentId(studentId)
@@ -88,8 +96,11 @@ public class ReservationService {
                 .existsByPc_IdAndStatusAndCreatedAtLessThanEqualAndExpectedReturnDateGreaterThanEqual(
                         pc.getId(),
                         Transport.TransportStatus.IN_PROGRESS,
-                        LocalDateTime.parse(dto.getDate() + "T00:00:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                        LocalDateTime.parse(
+                                dto.getDate() + "T00:00:00",
+                                DateTimeFormatter.ISO_LOCAL_DATE_TIME),
                         dto.getDate());
+
         if (isTransported) {
             throw new IllegalArgumentException(
                     String.format(
@@ -115,8 +126,9 @@ public class ReservationService {
             Period period = periodRepository.findById(Objects.requireNonNull(periodId))
                     .orElseThrow(() -> new IllegalArgumentException("ID: " + periodId + " の時限が見つかりません。"));
 
-            boolean isAlreadyBooked = reservationRepository.existsByPc_IdAndDateAndPeriod_Period(pc.getId(),
-                    dto.getDate(), period.getPeriod());
+            boolean isAlreadyBooked = reservationRepository.existsByPc_IdAndDateAndPeriod_Period(
+                    pc.getId(), dto.getDate(), period.getPeriod());
+
             if (isAlreadyBooked) {
                 throw new IllegalArgumentException(
                         dto.getDate() + " " + pc.getSerialNumber() + " の " + period.getName() + " は既に予約されています。");
@@ -207,6 +219,12 @@ public class ReservationService {
         reservationRepository.deleteAll(reservationsToDelete);
     }
 
+    /**
+     * ReservationGroupDto オブジェクトにグループ化された保留中の予約のリストを取得します
+     *
+     * @return グループ化された保留中の予約を表すReservationGroupDtoのリスト。
+     *         日付と期間の昇順で並べられています。
+     */
     public List<ReservationGroupDto> getPendingReservations() {
         List<Reservation> pending = reservationRepository.findByStatusOrderByDateAscPeriod_PeriodAsc(PENDING_APPROVAL);
         return reservationGroupingHelper.groupReservations(pending);
@@ -257,4 +275,14 @@ public class ReservationService {
         }
         reservationRepository.deleteAll(reservationsToDeny);
     }
+
+    /**
+     * 最近の返却報告（取り下げられた予約）を取得します。
+     *
+     * @return 返却報告（取り下げられた予約）のリスト
+     */
+    public List<Reservation> getRecentReturnReports() {
+        return reservationRepository.findByStatusOrderByRetractedAtDesc(Reservation.ReservationStatus.RETRACTED);
+    }
+
 }

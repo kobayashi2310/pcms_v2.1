@@ -1,6 +1,7 @@
 package njb.pcms.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import njb.pcms.model.User;
 import njb.pcms.repository.UserRepository;
 import njb.pcms.util.KanaConverter;
@@ -12,6 +13,7 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -23,13 +25,15 @@ public class UserService {
     private final KanaConverter kanaConverter;
 
     public List<User> searchUsers(String query) {
-        if (query.length() < 1) {
+        log.debug("Searching users with query: {}", query);
+        if (query.isEmpty()) {
             return List.of();
         }
 
         String katakana = kanaConverter.hiraganaToKatakana(query);
 
-        return userRepository.findTop10ByStudentIdContainingOrNameContainingOrKanaContaining(query, query, katakana);
+        return userRepository.findTop10ByStudentIdContainingOrNameContainingOrKanaContaining(
+                query, query, katakana);
     }
 
 }

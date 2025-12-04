@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="njb.pcms.BackendApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-12-04T00:22:40.173Z" hostname="T22010" time="0.415">
+  <properties/>
+  <testcase name="contextLoads()" classname="njb.pcms.BackendApplicationTests" time="0.415"/>
+  <system-out><![CDATA[09:22:31.485 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [njb.pcms.BackendApplicationTests]: BackendApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+09:22:31.776 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration njb.pcms.PcmsApplication for test class njb.pcms.BackendApplicationTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.6)
+
+2025-12-04T09:22:32.553+09:00  INFO 7276 --- [pcms] [    Test worker] njb.pcms.BackendApplicationTests         : Starting BackendApplicationTests using Java 21.0.8 with PID 7276 (started by hikaru in C:\pcms)
+2025-12-04T09:22:32.555+09:00  INFO 7276 --- [pcms] [    Test worker] njb.pcms.BackendApplicationTests         : No active profile set, falling back to 1 default profile: "default"
+2025-12-04T09:22:33.992+09:00  INFO 7276 --- [pcms] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-12-04T09:22:34.095+09:00  INFO 7276 --- [pcms] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 87 ms. Found 5 JPA repository interfaces.
+2025-12-04T09:22:34.323+09:00  WARN 7276 --- [pcms] [    Test worker] o.m.s.mapper.ClassPathMapperScanner      : No MyBatis mapper was found in '[njb.pcms]' package. Please check your configuration.
+2025-12-04T09:22:34.941+09:00  INFO 7276 --- [pcms] [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-12-04T09:22:35.040+09:00  INFO 7276 --- [pcms] [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.29.Final
+2025-12-04T09:22:35.121+09:00  INFO 7276 --- [pcms] [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-12-04T09:22:35.642+09:00  INFO 7276 --- [pcms] [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-12-04T09:22:35.688+09:00  INFO 7276 --- [pcms] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-12-04T09:22:36.144+09:00  INFO 7276 --- [pcms] [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@9320aed
+2025-12-04T09:22:36.153+09:00  INFO 7276 --- [pcms] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-12-04T09:22:36.283+09:00  WARN 7276 --- [pcms] [    Test worker] org.hibernate.dialect.Dialect            : HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2025-12-04T09:22:36.318+09:00  INFO 7276 --- [pcms] [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 5.7.44
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-12-04T09:22:37.730+09:00  INFO 7276 --- [pcms] [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-12-04T09:22:37.841+09:00  INFO 7276 --- [pcms] [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-12-04T09:22:38.457+09:00  WARN 7276 --- [pcms] [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-12-04T09:22:38.514+09:00  INFO 7276 --- [pcms] [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2025-12-04T09:22:38.942+09:00  INFO 7276 --- [pcms] [    Test worker] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailsServiceImpl
+2025-12-04T09:22:39.786+09:00  INFO 7276 --- [pcms] [    Test worker] njb.pcms.BackendApplicationTests         : Started BackendApplicationTests in 7.673 seconds (process running for 9.974)
+]]></system-out>
+  <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (C:\Users\jyunn\.gradle\caches\modules-2\files-2.1\net.bytebuddy\byte-buddy-agent\1.17.7\fbf3d6d649ed37fc9e9c59480a05be0a26e3c2da\byte-buddy-agent-1.17.7.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>

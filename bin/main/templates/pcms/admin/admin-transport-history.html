@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin_layout}">
+<head>
+    <title>PC持ち出し履歴</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">PC持ち出し履歴</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary">エクスポート</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Filter (Placeholder) -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="searchPc" class="form-label">PCシリアル番号</label>
+                    <input type="text" class="form-control" id="searchPc" placeholder="検索...">
+                </div>
+                <div class="col-md-3">
+                    <label for="searchUser" class="form-label">利用者名/学籍番号</label>
+                    <input type="text" class="form-control" id="searchUser" placeholder="検索...">
+                </div>
+                <div class="col-md-3">
+                    <label for="searchDate" class="form-label">日付</label>
+                    <input type="date" class="form-control" id="searchDate">
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-primary w-100" disabled>
+                        <i class="bi bi-search me-1"></i>検索 (未実装)
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- History Table -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>PC</th>
+                        <th>利用者</th>
+                        <th>持ち出し日時</th>
+                        <th>返却日時</th>
+                        <th>ステータス</th>
+                        <th>持ち出し先/目的</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(transports)}">
+                        <td colspan="7" class="text-center text-muted py-5">履歴はありません。</td>
+                    </tr>
+                    <tr th:each="transport : ${transports}">
+                        <td class="ps-4" th:text="${transport.id}"></td>
+                        <td class="fw-bold" th:text="${transport.pc.serialNumber}"></td>
+                        <td>
+                            <div th:text="${transport.user.name}"></div>
+                            <small class="text-muted" th:text="${transport.user.studentId}"></small>
+                        </td>
+                        <td th:text="${#temporals.format(transport.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
+                        <td th:text="${transport.returnedAt != null ? #temporals.format(transport.returnedAt, 'yyyy/MM/dd HH:mm') : '-'}"></td>
+                        <td>
+                            <span th:if="${transport.status.name() == 'IN_PROGRESS'}" class="badge bg-warning text-dark">持ち出し中</span>
+                            <span th:if="${transport.status.name() == 'COMPLETED'}" class="badge bg-success">返却済み</span>
+                        </td>
+                        <td class="text-truncate" style="max-width: 200px;">
+                            <div th:text="${transport.destination}" class="fw-bold"></div>
+                            <small th:text="${transport.reason}" class="text-muted"></small>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

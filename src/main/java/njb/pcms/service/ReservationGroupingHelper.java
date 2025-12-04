@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ *特定の基準に基づいて予約をグループ化し、
+ * ReservationGroupDto オブジェクトのリストにまとめるユーティリティメソッドを提供します
+ */
 @Component
 public class ReservationGroupingHelper {
 
@@ -92,4 +96,5 @@ public class ReservationGroupingHelper {
         dto.setCreatedAt(first.getCreatedAt());
         return dto;
     }
+
 }

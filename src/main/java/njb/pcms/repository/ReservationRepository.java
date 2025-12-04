@@ -11,8 +11,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     /**
      * 指定されたPC、日付、時限IDで予約が存在するかどうかを確認します。
-     * @param pcId PCのID
-     * @param date 日付
+     * 
+     * @param pcId     PCのID
+     * @param date     日付
      * @param periodId 時限のID
      * @return 予約が存在すればtrue
      */
@@ -20,6 +21,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     /**
      * 指定された日付の予約を時限の昇順で検索します。
+     * 
      * @param date 検索する日付
      * @return 予約のリスト
      */
@@ -28,5 +30,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByUserOrderByDateDescPeriod_PeriodAsc(User user);
 
     List<Reservation> findByStatusOrderByDateAscPeriod_PeriodAsc(Reservation.ReservationStatus status);
+
+    List<Reservation> findByStatusOrderByRetractedAtDesc(Reservation.ReservationStatus status);
 
 }

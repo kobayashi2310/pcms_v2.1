@@ -1,5 +1,6 @@
 package njb.pcms.controller.pcms;
 
+import njb.pcms.constant.ViewNames;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,7 +11,7 @@ public class HomeController {
 
     @GetMapping
     public String homePage() {
-        return "pcms/home";
+        return ViewNames.PCMS_HOME;
     }
 
 }

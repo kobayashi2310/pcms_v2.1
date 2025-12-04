@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -72,7 +73,7 @@ public class TransportService {
         return transportRepository.findByStatus(Transport.TransportStatus.IN_PROGRESS)
                 .stream()
                 .map(transport -> transport.getPc().getId())
-                .collect(java.util.stream.Collectors.toSet());
+                .collect(Collectors.toSet());
     }
 
 }

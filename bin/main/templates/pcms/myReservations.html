@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>マイ予約一覧</title>
+    <link rel="stylesheet" th:href="@{/css/pcms/reservation.css}">
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="container py-4">
+        <h1 class="mb-4">予約一覧</h1>
+
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>あなたの予約</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" style="overflow-x: auto;">
+                    <table class="table table-hover" style="min-width: 700px;">
+                        <thead>
+                        <tr>
+                            <th>予約日</th>
+                            <th>PC</th>
+                            <th>利用時間帯</th>
+                            <th>ステータス</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(myReservations)}">
+                            <td colspan="5" class="text-center text-muted py-4">あなたの予約はありません。</td>
+                        </tr>
+                        <tr th:each="group : ${myReservations}">
+                            <td class="text-nowrap" th:text="${group.date}"></td>
+                            <td class="text-nowrap" th:text="${group.pcSerialNumber}"></td>
+                            <td class="text-nowrap" th:text="${group.getPeriodRange()}"></td>
+                            <td>
+                <span th:switch="${group.status.name()}">
+                  <span th:case="'PENDING_APPROVAL'" class="badge bg-warning text-dark" th:text="${group.status.getDisplayName()}"></span>
+                  <span th:case="'APPROVED'" class="badge" style="background-color: var(--theme-color-secondary);" th:text="${group.status.getDisplayName()}"></span>
+                  <span th:case="'RETRACTED'" class="badge bg-secondary" th:text="${group.status.getDisplayName()}"></span>
+                </span>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                        data-bs-toggle="modal" data-bs-target="#returnReportModal"
+                                        th:if="${group.status.name() == 'APPROVED'}"
+                                        th:attr="data-reservation-ids=${#strings.listJoin(group.reservationIds, ',')}">
+                                    返却報告
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                        data-bs-toggle="modal" data-bs-target="#cancelModal"
+                                        th:if="${group.status.name() == 'PENDING_APPROVAL'}"
+                                        th:attr="data-reservation-ids=${#strings.listJoin(group.reservationIds, ',')}">
+                                    キャンセル
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5 text-center">
+            <a th:href="@{/pcms}" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> ホームに戻る</a>
+        </div>
+    </div>
+
+    <div class="modal fade" id="returnReportModal" tabindex="-1" aria-labelledby="returnReportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="returnReportForm" th:action="@{/pcms/reservations/report-return}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="returnReportModalLabel">返却報告</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="returnReservationIds" name="reservationIds"/>
+                        <div class="mb-3">
+                            <label for="retractionReason" class="form-label">作業報告</label>
+                            <textarea class="form-control" id="retractionReason" name="retractionReason" rows="3" placeholder="PCで行った作業内容を記入してください。" required></textarea>
+                            <div class="invalid-feedback">作業報告は必須です。</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                        <button type="submit" class="btn btn-primary">報告する</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="cancelForm" th:action="@{/pcms/reservations/cancel}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelModalLabel">予約のキャンセル</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>本当にこの予約をキャンセルしますか？</p>
+                        <input type="hidden" id="cancelReservationIds" name="reservationIds"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">いいえ</button>
+                        <button type="submit" class="btn btn-danger">はい、キャンセルします</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/myReservations.js}" defer></script>
+    </th:block>
+</main>
+</body>
+</html>
+

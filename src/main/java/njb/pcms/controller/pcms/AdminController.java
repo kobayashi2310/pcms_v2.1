@@ -46,6 +46,8 @@ public class AdminController {
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
         model.addAttribute("pendingReservations", reservationService.getPendingReservations());
+        model.addAttribute("activeTransports", transportService.getActiveTransports());
+        model.addAttribute("returnReports", reservationService.getRecentReturnReports());
         return ViewNames.PCMS_ADMIN_RESERVATIONS;
     }
 
@@ -99,7 +101,7 @@ public class AdminController {
     @GetMapping("/transport/history")
     public String showTransportHistoryPage(Model model) {
         model.addAttribute("transports", transportService.getAllTransportHistory());
-        return "pcms/admin/admin-transport-history";
+        return ViewNames.PCMS_ADMIN_TRANSPORT_HISTORY;
     }
 
     // POST /pcms/admin/transport

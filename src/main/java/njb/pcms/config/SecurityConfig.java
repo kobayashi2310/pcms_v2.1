@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class SecurityConfig {
 
 	private final AuthenticationSuccessHandler authenticationSuccessHandler;
+	private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
 	@Bean
 	PasswordEncoder passwordEncoder() {
@@ -52,7 +53,7 @@ public class SecurityConfig {
 						.passwordParameter("password")
 						.loginProcessingUrl("/pcms/login")
 						.successHandler(authenticationSuccessHandler)
-						.failureUrl("/pcms/login?error=true")
+						.failureHandler(customAuthenticationFailureHandler)
 						.permitAll())
 				.logout(logout -> logout
 						.logoutUrl("/pcms/logout")

@@ -34,6 +34,7 @@ public class ReservationController {
     private final TransportService transportService;
 
     /**
+     * GET /pcms/reservations
      * 予約ページを表示します。
      *
      * @param date  表示する日付 (オプション)。指定がない場合は現在の日付が使用されます。
@@ -70,6 +71,7 @@ public class ReservationController {
     }
 
     /**
+     * POST /pcms/reservations
      * 新しい予約を作成します。
      *
      * @param reservationRequest 予約リクエスト情報
@@ -84,7 +86,6 @@ public class ReservationController {
             BindingResult bindingResult,
             Authentication authentication,
             RedirectAttributes redirectAttributes) {
-
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute(
                     FlashMessages.KEY_BINDING_RESULT_PREFIX + "reservationRequest",
@@ -105,6 +106,7 @@ public class ReservationController {
     }
 
     /**
+     * GET /pcms/reservations/my-reservations
      * 自分の予約一覧ページを表示します。
      *
      * @param authentication 認証情報
@@ -119,6 +121,7 @@ public class ReservationController {
     }
 
     /**
+     * POST /pcms/reservations/report-return
      * 返却報告を行います。
      *
      * @param dto                返却報告データ
@@ -151,6 +154,7 @@ public class ReservationController {
     }
 
     /**
+     * POST /pcms/reservations/cancel
      * 予約をキャンセルします。
      *
      * @param reservationIds     キャンセルする予約IDのリスト
