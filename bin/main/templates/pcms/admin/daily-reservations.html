@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html
+  lang="ja"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/admin_layout}"
+>
+  <head>
+    <title>日別予約一覧</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+      >
+        <h1 class="h2">日別予約一覧</h1>
+      </div>
+
+      <!-- Date Navigation -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <a th:href="@{/pcms/admin/reservations(date=${prevDate})}" class="btn btn-outline-secondary btn-sm">&lt; 前日</a>
+            <form th:action="@{/pcms/admin/reservations}" method="get" class="d-inline-block my-0">
+              <label>
+                <input
+                    type="date"
+                    name="date"
+                    th:value="${#temporals.format(selectedDate, 'yyyy-MM-dd')}"
+                    onchange="this.form.submit()"
+                    class="form-control form-control-sm"
+                >
+              </label>
+            </form>
+            <a th:href="@{/pcms/admin/reservations(date=${nextDate})}" class="btn btn-outline-secondary btn-sm">翌日 &gt;</a>
+          </div>
+        </div>
+        <div class="card-body">
+          <h2 class="h4" th:text="${#temporals.format(selectedDate, 'yyyy年MM月dd日')} + 'の予約一覧'"></h2>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+              <tr>
+                <th>利用者</th>
+                <th>PC</th>
+                <th>利用時間帯</th>
+                <th>理由</th>
+                <th>ステータス</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:if="${#lists.isEmpty(reservations)}">
+                <td colspan="5" class="text-center text-muted py-4">この日に予約はありません</td>
+              </tr>
+              <tr th:each="group : ${reservations}">
+                <td class="fw-bold" th:text="${group.studentName}"></td>
+                <td>
+                    <span class="badge bg-secondary" th:text="${group.pcSerialNumber}"></span>
+                </td>
+                <td class="text-nowrap" th:text="${group.getPeriodRange()}"></td>
+                <td class="text-truncate" style="max-width: 200px;" th:text="${group.reason}" th:title="${group.reason}"></td>
+                <td>
+                  <span th:switch="${group.status.name()}">
+                    <span th:case="'PENDING_APPROVAL'"
+                          class="badge bg-warning text-dark"
+                          th:text="${group.status.getDisplayName()}"
+                    ></span>
+                    <span th:case="'APPROVED'"
+                          class="badge bg-success"
+                          th:text="${group.status.getDisplayName()}"
+                    ></span>
+                    <span th:case="'RETRACTED'"
+                          class="badge bg-secondary"
+                          th:text="${group.status.getDisplayName()}"
+                    ></span>
+                  </span>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>

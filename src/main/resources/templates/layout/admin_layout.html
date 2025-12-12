@@ -82,6 +82,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" th:classappend="${requestURI.contains('/reservations') ? 'active' : ''}" th:href="@{/pcms/admin/reservations}">
+                            <i class="bi bi-calendar-check"></i>日別予約一覧
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" th:classappend="${requestURI.contains('/history') ? 'active' : ''}" th:href="@{/pcms/admin/transport/history}">
                             <i class="bi bi-clock-history"></i>持ち出し履歴
                         </a>

@@ -68,7 +68,11 @@
               <h5 class="card-title display-6" th:text="${todayReservationCount} + ' 件'">
                 - 件
               </h5>
-              <p class="card-text small">今日の予約総数</p>
+              <p class="card-text small">
+                  <a th:href="@{/pcms/admin/reservations}" class="text-white text-decoration-none hover-underline">
+                      今日の予約総数 <i class="bi bi-arrow-right-circle"></i>
+                  </a>
+              </p>
             </div>
           </div>
         </div>
@@ -76,8 +80,8 @@
           <div class="card text-white bg-info mb-3 shadow-sm">
             <div class="card-header">持ち出し中PC</div>
             <div class="card-body">
-              <h5 class="card-title display-6">- 台</h5>
-              <p class="card-text small">※実装予定</p>
+              <h5 class="card-title display-6" th:text="${activeTransports.size()} + ' 台'">- 台</h5>
+              <p class="card-text small">現在貸出中のPC台数</p>
             </div>
           </div>
         </div>

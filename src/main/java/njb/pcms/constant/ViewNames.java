@@ -31,6 +31,11 @@ public class ViewNames {
     public static final String PCMS_ADMIN_TRANSPORT_HISTORY = "pcms/admin/admin-transport-history";
 
     /**
+     * 管理者 日別予約一覧
+     */
+    public static final String PCMS_ADMIN_DAILY_RESERVATIONS = "pcms/admin/daily-reservations";
+
+    /**
      * ログイン
      */
     public static final String PCMS_LOGIN = "pcms/public/login";

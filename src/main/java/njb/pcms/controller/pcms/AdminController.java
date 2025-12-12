@@ -108,6 +108,21 @@ public class AdminController {
         return ViewNames.PCMS_ADMIN_TRANSPORT_HISTORY;
     }
 
+    // GET /pcms/admin/reservations
+    @GetMapping("/reservations")
+    public String dailyReservations(
+            @RequestParam(name = "date", required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date,
+            Model model) {
+        java.time.LocalDate selectedDate = (date == null) ? java.time.LocalDate.now() : date;
+
+        model.addAttribute("reservations", reservationService.getGroupedReservationsByDate(selectedDate));
+        model.addAttribute("selectedDate", selectedDate);
+        model.addAttribute("prevDate", selectedDate.minusDays(1));
+        model.addAttribute("nextDate", selectedDate.plusDays(1));
+
+        return ViewNames.PCMS_ADMIN_DAILY_RESERVATIONS;
+    }
+
     // POST /pcms/admin/transport
     @PostMapping("/transport")
     public String createTransport(

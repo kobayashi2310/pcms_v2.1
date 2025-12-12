@@ -140,7 +140,13 @@ public class ReservationService {
             reservation.setDate(dto.getDate());
             reservation.setPeriod(period);
             reservation.setReason(dto.getReason());
-            reservation.setStatus(Reservation.ReservationStatus.PENDING_APPROVAL);
+
+            if (dto.getDate().isEqual(LocalDate.now())) {
+                reservation.setStatus(APPROVED);
+                reservation.setApprovedAt(LocalDateTime.now());
+            } else {
+                reservation.setStatus(PENDING_APPROVAL);
+            }
             reservationsToSave.add(reservation);
         }
 
