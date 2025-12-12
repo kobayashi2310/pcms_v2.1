@@ -285,4 +285,14 @@ public class ReservationService {
         return reservationRepository.findByStatusOrderByRetractedAtDesc(Reservation.ReservationStatus.RETRACTED);
     }
 
+    /**
+     * 指定された日付の予約数を取得します。
+     *
+     * @param date 検索する日付
+     * @return 予約数
+     */
+    public int getReservationCountForDate(LocalDate date) {
+        return reservationRepository.countByDate(date);
+    }
+
 }

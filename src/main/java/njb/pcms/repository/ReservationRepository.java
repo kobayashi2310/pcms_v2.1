@@ -58,4 +58,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
      */
     List<Reservation> findByStatusOrderByRetractedAtDesc(Reservation.ReservationStatus status);
 
+    /**
+     * 指定された日付の予約数をカウントします。
+     *
+     * @param date 検索する日付
+     * @return 予約数
+     */
+    int countByDate(LocalDate date);
+
 }

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,6 +50,8 @@ public class AdminController {
         model.addAttribute("pendingReservations", reservationService.getPendingReservations());
         model.addAttribute("activeTransports", transportService.getActiveTransports());
         model.addAttribute("returnReports", reservationService.getRecentReturnReports());
+        model.addAttribute("todayReservationCount",
+                reservationService.getReservationCountForDate(LocalDate.now()));
         return ViewNames.PCMS_ADMIN_RESERVATIONS;
     }
 

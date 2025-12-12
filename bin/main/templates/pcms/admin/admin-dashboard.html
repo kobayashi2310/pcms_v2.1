@@ -65,8 +65,10 @@
           <div class="card text-white bg-success mb-3 shadow-sm">
             <div class="card-header">本日の予約数</div>
             <div class="card-body">
-              <h5 class="card-title display-6">- 件</h5>
-              <p class="card-text small">※実装予定</p>
+              <h5 class="card-title display-6" th:text="${todayReservationCount} + ' 件'">
+                - 件
+              </h5>
+              <p class="card-text small">今日の予約総数</p>
             </div>
           </div>
         </div>
