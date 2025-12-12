@@ -133,4 +133,24 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
+
+  // Edit Transport Logic
+  const editTransportModalEl = document.getElementById('editTransportModal');
+  if (editTransportModalEl) {
+    const editTransportModal = new bootstrap.Modal(editTransportModalEl);
+    const editTransportIdInput = document.getElementById('editTransportId');
+    const editExpectedReturnDateInput = document.getElementById('editExpectedReturnDate');
+
+    document.querySelectorAll('.edit-transport-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const date = this.getAttribute('data-date');
+            
+            editTransportIdInput.value = id;
+            editExpectedReturnDateInput.value = date;
+            
+            editTransportModal.show();
+        });
+    });
+  }
 });

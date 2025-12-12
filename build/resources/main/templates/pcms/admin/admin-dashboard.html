@@ -191,7 +191,7 @@
           <div class="card shadow-sm h-100">
             <div class="card-header bg-white py-3">
               <h5 class="mb-0">
-                <i class="bi bi-pc-display me-2 text-primary"></i>貸出状況
+                <i class="bi bi-pc-display me-2 text-primary"></i>持ち出し状況
               </h5>
             </div>
             <div class="card-body p-0">
@@ -271,24 +271,24 @@
                     <tr th:each="report : ${returnReports}">
                       <td
                         class="ps-4 fw-bold"
-                        th:text="${report.user.studentId} + ' ' + ${report.user.name}"
+                        th:text="${report.studentName}"
                       ></td>
                       <td>
                         <span
                           class="badge bg-secondary"
-                          th:text="${report.pc.serialNumber}"
+                          th:text="${report.pcSerialNumber}"
                         ></span>
+                        <span class="ms-1 small text-muted" th:text="'(' + ${report.getPeriodRange()} + ')'"></span>
                       </td>
                       <td
                         class="text-nowrap"
                         th:text="${#temporals.format(report.retractedAt, 'yyyy/MM/dd HH:mm')}"
                       ></td>
-                      <td
-                        class="text-truncate"
-                        style="max-width: 150px"
-                        th:text="${report.retractionReason}"
-                        th:title="${report.retractionReason}"
-                      ></td>
+                      <td>
+                        <div style="max-width: 300px; white-space: normal; line-height: 1.4;">
+                          <span th:text="${report.retractionReason}"></span>
+                        </div>
+                      </td>
                     </tr>
                   </tbody>
                 </table>

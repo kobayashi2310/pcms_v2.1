@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *特定の基準に基づいて予約をグループ化し、
+ * 特定の基準に基づいて予約をグループ化し、
  * ReservationGroupDto オブジェクトのリストにまとめるユーティリティメソッドを提供します
  */
 @Component
@@ -60,11 +60,13 @@ public class ReservationGroupingHelper {
     private boolean isConsecutive(Reservation currentReservation, List<Reservation> currentGroupList) {
         Reservation lastReservationInGroup = currentGroupList.getLast();
 
-        return lastReservationInGroup.getUser().getId().equals(currentReservation.getUser().getId()) &&
+        boolean basicsMatch = lastReservationInGroup.getUser().getId().equals(currentReservation.getUser().getId()) &&
                 lastReservationInGroup.getPc().getId().equals(currentReservation.getPc().getId()) &&
                 lastReservationInGroup.getStatus() == currentReservation.getStatus() &&
                 lastReservationInGroup.getDate().equals(currentReservation.getDate()) &&
                 (lastReservationInGroup.getPeriod().getPeriod() + 1 == currentReservation.getPeriod().getPeriod());
+
+        return basicsMatch;
     }
 
     /**
@@ -93,7 +95,9 @@ public class ReservationGroupingHelper {
                         .map(Reservation::getId)
                         .collect(Collectors.toList()));
         dto.setReason(first.getReason());
+        dto.setRetractionReason(first.getRetractionReason());
         dto.setCreatedAt(first.getCreatedAt());
+        dto.setRetractedAt(first.getRetractedAt());
         return dto;
     }
 

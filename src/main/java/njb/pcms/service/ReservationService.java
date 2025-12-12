@@ -298,7 +298,37 @@ public class ReservationService {
      * @return 予約数
      */
     public int getReservationCountForDate(LocalDate date) {
-        return reservationRepository.countByDate(date);
+        return getGroupedReservationsByDate(date).size();
+    }
+
+    public List<ReservationGroupDto> getGroupedRecentReturnReports() {
+        List<Reservation> rawList = reservationRepository
+                .findByStatusOrderByRetractedAtDesc(Reservation.ReservationStatus.RETRACTED);
+
+        // GroupingHelper expects consecutive periods.
+        // But rawList is ordered by RetractedAt.
+        // We need to re-group them by (User, Date, PC, RetractedAt approx?).
+        // Actually, if we sort by User, Date, PC, Period, we can form groups.
+        // Then we can sort the GROUPS by RetractedAt.
+
+        List<Reservation> sortedForGrouping = rawList.stream()
+                .sorted(Comparator.comparing((Reservation r) -> r.getUser().getId())
+                        .thenComparing(r -> r.getDate())
+                        .thenComparing(r -> r.getPc().getId())
+                        .thenComparing(r -> r.getPeriod().getPeriod()))
+                .collect(Collectors.toList());
+
+        List<ReservationGroupDto> groups = reservationGroupingHelper.groupReservations(sortedForGrouping);
+
+        // Sort groups by RetractedAt DESC (Recent first)
+        groups.sort((g1, g2) -> {
+            if (g1.getRetractedAt() == null || g2.getRetractedAt() == null)
+                return 0;
+            return g2.getRetractedAt().compareTo(g1.getRetractedAt());
+        });
+
+        // Limit to recent 20
+        return groups.stream().limit(20).collect(Collectors.toList());
     }
 
 }

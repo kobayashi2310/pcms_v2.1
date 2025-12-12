@@ -17,7 +17,9 @@ public class ReservationGroupDto {
     private Reservation.ReservationStatus status;
     private List<Long> reservationIds;
     private String reason;
+    private String retractionReason;
     private LocalDateTime createdAt;
+    private LocalDateTime retractedAt;
 
     public String getPeriodRange() {
         if (startPeriodName.equals(endPeriodName)) {
@@ -25,8 +27,7 @@ public class ReservationGroupDto {
         }
         return String.format(
                 "%s - %s",
-                startPeriodName, endPeriodName
-        );
+                startPeriodName, endPeriodName);
     }
 
 }

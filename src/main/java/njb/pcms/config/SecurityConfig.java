@@ -36,7 +36,7 @@ public class SecurityConfig {
 						.requestMatchers("/", "/pcms", "/pcms/reservations").permitAll()
 						.requestMatchers("/pcms/reservations/my-reservations",
 								"/pcms/reservations/report-return/**")
-						.authenticated()
+						.hasRole("STUDENT")
 						.requestMatchers(
 								HttpMethod.POST,
 								"/pcms/admin/reservations/approve",
@@ -57,7 +57,7 @@ public class SecurityConfig {
 						.permitAll())
 				.logout(logout -> logout
 						.logoutUrl("/pcms/logout")
-						.logoutSuccessUrl("/pcms")
+						.logoutSuccessUrl("/pcms/logout-success")
 						.permitAll());
 		return http.build();
 	}

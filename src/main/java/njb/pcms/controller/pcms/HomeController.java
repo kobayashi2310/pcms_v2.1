@@ -14,4 +14,10 @@ public class HomeController {
         return ViewNames.PCMS_HOME;
     }
 
+    @GetMapping("/logout-success")
+    public String logoutSuccess(org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("logoutMessage", "ログアウトしました。");
+        return "redirect:/pcms";
+    }
+
 }

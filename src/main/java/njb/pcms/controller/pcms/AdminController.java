@@ -6,6 +6,7 @@ import njb.pcms.constant.FlashMessages;
 import njb.pcms.constant.UrlPaths;
 import njb.pcms.constant.ViewNames;
 import njb.pcms.dto.pcms.admin.TransportRequestDto;
+import njb.pcms.dto.pcms.admin.TransportUpdateRequestDto;
 import njb.pcms.model.User;
 import njb.pcms.service.PcService;
 import njb.pcms.service.ReservationService;
@@ -14,6 +15,7 @@ import njb.pcms.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -49,7 +51,7 @@ public class AdminController {
     public String showDashboard(Model model) {
         model.addAttribute("pendingReservations", reservationService.getPendingReservations());
         model.addAttribute("activeTransports", transportService.getActiveTransports());
-        model.addAttribute("returnReports", reservationService.getRecentReturnReports());
+        model.addAttribute("returnReports", reservationService.getGroupedRecentReturnReports());
         model.addAttribute("todayReservationCount",
                 reservationService.getReservationCountForDate(LocalDate.now()));
         return ViewNames.PCMS_ADMIN_RESERVATIONS;
@@ -138,8 +140,30 @@ public class AdminController {
             transportService.createTransport(dto);
             redirectAttributes.addFlashAttribute(FlashMessages.KEY_SUCCESS, "PC持ち出しを登録しました。");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute(FlashMessages.KEY_ERROR, "処理に失敗しました: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(FlashMessages.KEY_ERROR, "登録処理に失敗しました: " + e.getMessage());
+            e.printStackTrace();
         }
+        return ViewNames.REDIRECT_PCMS_ADMIN_TRANSPORT;
+    }
+
+    @PostMapping("/transport/update")
+    public String updateTransport(@Validated @ModelAttribute TransportUpdateRequestDto dto, BindingResult result,
+            RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "入力内容に不備があります。");
+            return ViewNames.REDIRECT_PCMS_ADMIN_TRANSPORT;
+        }
+
+        try {
+            transportService.updateTransport(dto);
+            redirectAttributes.addFlashAttribute("successMessage", "返却予定日を更新しました。");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) { // Catch unexpected errors
+            redirectAttributes.addFlashAttribute("errorMessage", "予期せぬエラーが発生しました: " + e.getMessage());
+            e.printStackTrace(); // Log it
+        }
+
         return ViewNames.REDIRECT_PCMS_ADMIN_TRANSPORT;
     }
 

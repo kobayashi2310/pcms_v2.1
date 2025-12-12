@@ -17,10 +17,10 @@
         <img alt="icon" th:src="@{/img/T-2.png}" class="responsive-icon d-none d-sm-block">
       </div>
 
-<!--      <div th:if="${logoutMessage}" class="alert alert-success alert-dismissible fade show" role="alert">-->
-<!--        <span th:text="${logoutMessage}"></span>-->
-<!--        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>-->
-<!--      </div>-->
+      <div th:if="${logoutMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${logoutMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
 
       <div class="row justify-content-center">
         <div class="col-12 col-md-6 mb-3" sec:authorize="isAnonymous()">

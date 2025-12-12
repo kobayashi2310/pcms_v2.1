@@ -56,13 +56,20 @@
                             <small class="text-muted" th:text="${transport.user.studentId}"></small>
                         </td>
                         <td th:text="${#temporals.format(transport.createdAt, 'MM/dd HH:mm')}"></td>
-                        <td th:text="${#temporals.format(transport.expectedReturnDate, 'MM/dd HH:mm')}"></td>
+                        <td th:text="${#temporals.format(transport.expectedReturnDate, 'MM/dd')}"></td>
                         <td class="text-end pe-4">
-                            <form th:action="@{/pcms/admin/transport/complete/{id}(id=${transport.id})}" method="post">
-                                <button type="submit" class="btn btn-sm btn-outline-primary" onclick="return confirm('返却処理を行いますか？');">
-                                    <i class="bi bi-box-arrow-in-down-left me-1"></i>返却
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary edit-transport-btn"
+                                        th:data-id="${transport.id}"
+                                        th:data-date="${transport.expectedReturnDate}">
+                                    <i class="bi bi-pencil me-1"></i>編集
                                 </button>
-                            </form>
+                                <form th:action="@{/pcms/admin/transport/complete/{id}(id=${transport.id})}" method="post">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary" onclick="return confirm('返却処理を行いますか？');">
+                                        <i class="bi bi-box-arrow-in-down-left me-1"></i>返却
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     </tbody>
@@ -99,8 +106,8 @@
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input type="datetime-local" class="form-control" id="expectedReturnDate" th:field="*{expectedReturnDate}" required>
-                            <label for="expectedReturnDate">返却予定日時</label>
+                            <input type="date" class="form-control" id="expectedReturnDate" th:field="*{expectedReturnDate}" required>
+                            <label for="expectedReturnDate">返却予定日</label>
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('expectedReturnDate')}" th:errors="*{expectedReturnDate}"></div>
                         </div>
 
@@ -111,7 +118,7 @@
                         </div>
 
                         <div class="form-floating mb-3">
-                            <textarea class="form-control" id="reason" th:field="*{reason}" style="height: 100px" placeholder="利用目的" required></textarea>
+                            <input type="textarea" class="form-control" id="reason" th:field="*{reason}" style="height: 100px" placeholder="利用目的" required></textarea>
                             <label for="reason">利用目的</label>
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('reason')}" th:errors="*{reason}"></div>
                         </div>
@@ -119,6 +126,34 @@
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-save me-2"></i>登録する
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Transport Modal -->
+    <div class="modal fade" id="editTransportModal" tabindex="-1" aria-labelledby="editTransportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTransportModalLabel">持ち出し情報の編集</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/pcms/admin/transport/update}" method="post">
+                        <input type="hidden" id="editTransportId" name="id">
+                        
+                        <div class="form-floating mb-3">
+                            <input type="date" class="form-control" id="editExpectedReturnDate" name="expectedReturnDate" required>
+                            <label for="editExpectedReturnDate">返却予定日</label>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-2"></i>更新する
                             </button>
                         </div>
                     </form>
@@ -138,6 +173,7 @@
     <!-- External JS -->
     <script th:src="@{/js/admin-transport.js}"></script>
 </div>
+
 </div>
 </body>
 </html>

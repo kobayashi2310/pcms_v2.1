@@ -2,6 +2,7 @@ package njb.pcms.service;
 
 import lombok.RequiredArgsConstructor;
 import njb.pcms.dto.pcms.admin.TransportRequestDto;
+import njb.pcms.dto.pcms.admin.TransportUpdateRequestDto;
 import njb.pcms.model.Pc;
 import njb.pcms.model.Transport;
 import njb.pcms.model.User;
@@ -75,6 +76,18 @@ public class TransportService {
                 .stream()
                 .map(transport -> transport.getPc().getId())
                 .collect(Collectors.toSet());
+    }
+
+    public void updateTransport(TransportUpdateRequestDto dto) {
+        Transport transport = transportRepository.findById(Objects.requireNonNull(dto.getId()))
+                .orElseThrow(() -> new IllegalArgumentException("指定された持ち出し記録が見つかりません"));
+
+        if (transport.getStatus() != Transport.TransportStatus.IN_PROGRESS) {
+            throw new IllegalArgumentException("この持ち出し記録は変更できません（返却済みです）");
+        }
+
+        transport.setExpectedReturnDate(dto.getExpectedReturnDate());
+        transportRepository.save(transport);
     }
 
 }
