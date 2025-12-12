@@ -2,9 +2,18 @@ package njb.pcms.util;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * ひらがなをカタカナに変換するユーティリティ
+ */
 @Component
 public class KanaConverter {
 
+    /**
+     * ひらがなをカタカナに変換します。
+     * 
+     * @param hiragana 変換するひらがな
+     * @return 変換後のカタカナ
+     */
     public String hiraganaToKatakana(String hiragana) {
         if (hiragana == null) {
             return null;

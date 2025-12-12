@@ -2,6 +2,9 @@ package njb.pcms.constant;
 
 import java.util.Set;
 
+/**
+ * 時限の定数
+ */
 public class PeriodConstants {
     public static final byte PERIOD_1 = 1;
     public static final byte PERIOD_2 = 2;

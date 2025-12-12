@@ -3,10 +3,17 @@ package njb.pcms.repository;
 import njb.pcms.model.Reservation;
 import njb.pcms.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * 予約のリポジトリ
+ * 
+ * @author kobayashi
+ */
+@Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     /**
@@ -27,10 +34,28 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
      */
     List<Reservation> findByDateOrderByPc_IdAscUser_IdAscPeriod_PeriodAsc(LocalDate date);
 
+    /**
+     * 指定されたユーザーの予約を日付降順、時限昇順で検索します。
+     * 
+     * @param user 検索するユーザー
+     * @return 予約のリスト
+     */
     List<Reservation> findByUserOrderByDateDescPeriod_PeriodAsc(User user);
 
+    /**
+     * 指定されたステータスの予約を日付昇順、時限昇順で検索します。
+     * 
+     * @param status 検索するステータス
+     * @return 予約のリスト
+     */
     List<Reservation> findByStatusOrderByDateAscPeriod_PeriodAsc(Reservation.ReservationStatus status);
 
+    /**
+     * 指定されたステータスの予約を返却日時降順で検索します。
+     * 
+     * @param status 検索するステータス
+     * @return 予約のリスト
+     */
     List<Reservation> findByStatusOrderByRetractedAtDesc(Reservation.ReservationStatus status);
 
 }

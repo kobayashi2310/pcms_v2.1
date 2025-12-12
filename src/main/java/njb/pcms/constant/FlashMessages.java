@@ -1,5 +1,8 @@
 package njb.pcms.constant;
 
+/**
+ * フラッシュメッセージの定数
+ */
 public class FlashMessages {
     public static final String KEY_SUCCESS = "successMessage";
     public static final String KEY_ERROR = "errorMessage";
