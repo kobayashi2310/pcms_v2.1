@@ -109,7 +109,7 @@
        id="reservationModal"
        tabindex="-1"
        aria-labelledby="reservationModalLabel"
-       aria-hidden="true"
+       th:aria-hidden="${#fields.hasErrors('reservationRequest.*')} ? 'false' : 'true'"
        sec:authorize="isAuthenticated()"
   >
     <div class="modal-dialog modal-lg">
