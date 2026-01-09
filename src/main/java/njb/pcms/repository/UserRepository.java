@@ -45,4 +45,22 @@ public interface UserRepository extends JpaRepository<User, Long> {
             String name,
             String kana);
 
+    /**
+     * 指定された役割と、学生IDの前方一致で件数をカウントします。
+     * 
+     * @param role   役割
+     * @param prefix 学生IDのプレフィックス
+     * @return カウント数
+     */
+    long countByRoleAndStudentIdStartingWith(User.UserRole role, String prefix);
+
+    /**
+     * 指定された役割と、学生IDの前方一致でユーザーを検索します。
+     * 
+     * @param role   役割
+     * @param prefix 学生IDのプレフィックス
+     * @return ユーザーリスト
+     */
+    List<User> findByRoleAndStudentIdStartingWith(User.UserRole role, String prefix);
+
 }

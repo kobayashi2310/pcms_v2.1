@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class        DataInitializer implements CommandLineRunner {
+public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -22,7 +22,6 @@ public class        DataInitializer implements CommandLineRunner {
             admin.setStudentId("ADMIN");
             admin.setName("ADMIN");
             admin.setKana("ADMIN");
-            admin.setEmail("admin@localhost");
             admin.setHashedPassword(passwordEncoder.encode("password"));
             admin.setRole(User.UserRole.ADMIN);
             userRepository.save(admin);
@@ -31,7 +30,6 @@ public class        DataInitializer implements CommandLineRunner {
             user.setStudentId("T22010");
             user.setName("小林輝流");
             user.setKana("コバヤシ ヒカル");
-            user.setEmail("njb-t22010@example.com");
             user.setHashedPassword(passwordEncoder.encode("password"));
             user.setRole(User.UserRole.STUDENT);
             userRepository.save(user);
@@ -40,7 +38,6 @@ public class        DataInitializer implements CommandLineRunner {
             user.setStudentId("T22017");
             user.setName("山上結史");
             user.setKana("ヤマガミ ユウシ");
-            user.setEmail("njb-t22017@sist.ac.jp");
             user.setHashedPassword(passwordEncoder.encode("pass"));
             user.setRole(User.UserRole.STUDENT);
             userRepository.save(user);

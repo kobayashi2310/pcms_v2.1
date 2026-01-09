@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin_layout}">
+<head>
+    <title>学生一括登録</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">学生一括登録</h1>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div th:if="${validationErrors}" class="alert alert-warning" role="alert">
+        <h5 class="alert-heading">入力内容にエラーがあります</h5>
+        <ul class="mb-0">
+            <li th:each="err : ${validationErrors}" th:text="${err}"></li>
+        </ul>
+    </div>
+
+    <form th:action="@{/pcms/admin/users/confirm}" method="post" th:object="${bulkStudentRegistrationDto}" style="max-width: 800px;">
+        <div class="mb-3">
+            <label for="admissionYear" class="form-label fs-5">入学年度 <span class="badge bg-danger">必須</span></label>
+            <input type="number" class="form-control form-control-lg" id="admissionYear" th:field="*{admissionYear}" placeholder="2025" min="2000" max="2100" required>
+            <div class="invalid-feedback" th:if="${#fields.hasErrors('admissionYear')}" th:errors="*{admissionYear}">
+                エラー
+            </div>
+            <div class="form-text fs-6">西暦を入力してください</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="studentListRaw" class="form-label fs-5">学生リスト (氏名,フリガナ) <span class="badge bg-danger">必須</span></label>
+            
+            <div class="d-flex border rounded">
+                <div id="line-numbers" class="bg-secondary text-white border-end text-end pe-2 pt-2"
+                     style="width: 50px; font-family: monospace; font-size: 1.25rem; line-height: 1.5; white-space: pre; overflow-y: hidden;">
+                    1
+                </div>
+                <textarea class="form-control form-control-lg border-0" id="studentListRaw" th:field="*{studentListRaw}" rows="10" 
+                          placeholder="山田 太郎,ヤマダ タロウ&#13;&#10;佐藤 花子,サトウ ハナコ" required
+                          style="font-family: monospace; line-height: 1.5; resize: none; white-space: pre; overflow-x: auto;"
+                          wrap="off"></textarea>
+            </div>
+
+            <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('studentListRaw')}" th:errors="*{studentListRaw}">
+                エラー
+            </div>
+            <div class="form-text">
+                1行に1人ずつ入力してください。<br>
+                氏名とフリガナの間はカンマ（,）で区切ってください。
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg">一括登録</button>
+        <a th:href="@{/pcms/admin/users}" class="btn btn-secondary btn-lg">キャンセル</a>
+    </form>
+    <script th:src="@{/js/admin-user-create.js}"></script>
+</div>
+</body>
+</html>

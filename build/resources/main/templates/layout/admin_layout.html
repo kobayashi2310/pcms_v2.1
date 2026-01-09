@@ -11,6 +11,7 @@
     <link th:href="@{/css/bootstrap/bootstrap-icons.css}" rel="stylesheet">
     <style>
         body {
+            font-size: 1.1rem;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -96,7 +97,7 @@
                         <span class="nav-link text-muted small text-uppercase px-4">システム管理</span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link disabled" href="#">
+                        <a class="nav-link" th:classappend="${requestURI.contains('/admin/users') ? 'active' : ''}" th:href="@{/pcms/admin/users}">
                             <i class="bi bi-people"></i>ユーザー管理
                         </a>
                     </li>

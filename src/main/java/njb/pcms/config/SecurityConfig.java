@@ -30,7 +30,7 @@ public class SecurityConfig {
 		http
 				.cors(AbstractHttpConfigurer::disable)
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/css/**", "/js/**", "/img/**", "/webjars/**", "/fonts/**")
+						.requestMatchers("/css/**", "/js/**", "/img/**", "/webjars/**", "/fonts/**", "/favicon.ico")
 						.permitAll()
 						.requestMatchers("/pcms/login").anonymous()
 						.requestMatchers("/", "/pcms", "/pcms/reservations").permitAll()
