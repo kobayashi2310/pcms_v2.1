@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user")
-@Getter @Setter
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
@@ -33,8 +34,8 @@ public class User {
     @Column(nullable = false)
     private String hashedPassword;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    // @Column(nullable = false, unique = true)
+    // private String email;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
