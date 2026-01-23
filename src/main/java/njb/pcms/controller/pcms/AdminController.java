@@ -101,8 +101,6 @@ public class AdminController {
         return ViewNames.PCMS_ADMIN_TRANSPORT;
     }
 
-    // TODO 持ち出し開始日、終了時の設定をする。ユーザー検索機能の追加
-
     // GET /pcms/admin/transport/history
     @GetMapping("/transport/history")
     public String showTransportHistoryPage(Model model) {
@@ -135,6 +133,7 @@ public class AdminController {
             redirectAttributes.addFlashAttribute(FlashMessages.KEY_BINDING_RESULT_PREFIX + "newTransport",
                     bindingResult);
             redirectAttributes.addFlashAttribute("newTransport", dto);
+            return ViewNames.REDIRECT_PCMS_ADMIN_TRANSPORT;
         }
         try {
             transportService.createTransport(dto);
@@ -146,6 +145,7 @@ public class AdminController {
         return ViewNames.REDIRECT_PCMS_ADMIN_TRANSPORT;
     }
 
+    // POST /pcms/admin/transport/update
     @PostMapping("/transport/update")
     public String updateTransport(@Validated @ModelAttribute TransportUpdateRequestDto dto, BindingResult result,
             RedirectAttributes redirectAttributes) {
@@ -159,9 +159,9 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("successMessage", "返却予定日を更新しました。");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-        } catch (Exception e) { // Catch unexpected errors
+        } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "予期せぬエラーが発生しました: " + e.getMessage());
-            e.printStackTrace(); // Log it
+            e.printStackTrace();
         }
 
         return ViewNames.REDIRECT_PCMS_ADMIN_TRANSPORT;

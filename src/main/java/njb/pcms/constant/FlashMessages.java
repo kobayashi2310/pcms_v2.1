@@ -16,7 +16,7 @@ public class FlashMessages {
     public static final String MSG_RESERVATION_CANCEL_FAILED = "予約のキャンセルに失敗しました: ";
     public static final String MSG_RESERVATION_APPROVED = "予約を承認しました。";
     public static final String MSG_RESERVATION_DENIED = "予約を否認しました。";
-    public static final String MSG_TRANSPORT_COMPLETED = "搬送完了処理を行いました。";
+    public static final String MSG_TRANSPORT_COMPLETED = "持ち出し処理を行いました。";
 
     private FlashMessages() {
         // Private constructor

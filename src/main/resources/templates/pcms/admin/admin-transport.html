@@ -118,7 +118,7 @@
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input type="textarea" class="form-control" id="reason" th:field="*{reason}" style="height: 100px" placeholder="利用目的" required></textarea>
+                            <textarea class="form-control" id="reason" th:field="*{reason}" style="height: 100px" placeholder="利用目的" required></textarea>
                             <label for="reason">利用目的</label>
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('reason')}" th:errors="*{reason}"></div>
                         </div>
